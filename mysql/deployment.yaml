@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-db
+data:
+  init-db.sql: |
+    CREATE DATABASE test;
+    use test;
+    CREATE TABLE address ( `uid` CHAR(5), `name` VARCHAR(256), `code` INT, `updated_date` DATE);
+    INSERT INTO address VALUES ('12345', 'Foo', 10, '2020-08-01');
+    INSERT INTO address VALUES ('54321', 'Bar', 20, '2020-08-01');
+    INSERT INTO address VALUES ('12345', 'Foo', 0, '2020-09-01');
+    INSERT INTO address VALUES ('54321', 'Bar', 0, '2020-09-01');
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:latest
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: password
+        volumeMounts:
+          - name: init-db
+            mountPath: ./docker-entrypoint-initdb.d
+      volumes:
+        - name: init-db
+          configMap:
+            name: init-db
+            
+            
