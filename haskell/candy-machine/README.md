@@ -17,11 +17,11 @@ simulateMachine 메서드는 입력들의 리스트를 받아서 남은 동전�
 ```hs
 data Input = Coin | Turn
 
-data Machine = {
+data Machine = Machine {
     locked :: Bool,
     candies :: Int,
     coins :: Int,
 }
 
-simulateMachine :: [Input] -> State (Machine, (Int, Int))
+simulateMachine :: [Input] -> State Machine (Int, Int)
 ```
