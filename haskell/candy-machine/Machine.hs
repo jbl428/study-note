@@ -9,24 +9,30 @@ data Machine = Machine {
     , coins :: Int
 } deriving Show
 
-handleInput :: Input -> State Machine (Int, Int)
-handleInput Coin = do
-    Machine locked candies coins <- get
-    if candies == 0
-        then return (candies, coins)
-        else do
-            put (Machine False candies (coins + 1))
-            return (candies, coins + 1)
-handleInput Turn = do
-    Machine locked candies coins <- get
-    (a, b, c) <- return (turn locked candies coins)
-    put (Machine a b c)
-    return (b, c)
+turn' :: Machine -> Machine
+turn' beforeMachine
+    | not locked && candies > 0 = Machine True (candies - 1) coins
+    | otherwise = beforeMachine
+    where (Machine locked candies coins) = beforeMachine
 
+coin' :: Machine -> Machine
+coin' beforeMachine
+    | locked && candies > 0 = Machine False candies (coins + 1)
+    | otherwise = beforeMachine
+    where (Machine locked candies coins) = beforeMachine
 
-turn :: Bool -> Int -> Int -> (Bool, Int, Int)
-turn locked 0 coins = (locked, 0, coins)
-turn True candies coins = (True, candies, coins)
-turn False candies coins
-    | coins > 0 && candies > 0 = (True, candies - 1, coins -1)
-    | otherwise = (True, candies, coins)
+handleInput :: Input -> State Machine ()
+handleInput Coin = modify coin'
+handleInput Turn = modify turn'
+
+simulateMachine :: [Input] -> State Machine (Int, Int)
+simulateMachine inputs = do
+    temp inputs
+    (Machine _ a b) <- get
+    return (a, b)
+    where
+        temp :: [Input] -> State Machine ()
+        temp (x:xs) = do
+            handleInput x
+            temp xs
+        temp [] = return ()
