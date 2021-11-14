@@ -27,12 +27,6 @@ handleInput Turn = modify turn'
 
 simulateMachine :: [Input] -> State Machine (Int, Int)
 simulateMachine inputs = do
-    temp inputs
+    forM_ inputs handleInput
     (Machine _ a b) <- get
     return (a, b)
-    where
-        temp :: [Input] -> State Machine ()
-        temp (x:xs) = do
-            handleInput x
-            temp xs
-        temp [] = return ()
