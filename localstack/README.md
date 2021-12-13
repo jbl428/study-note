@@ -171,3 +171,90 @@ describe("SES 테스트", () => {
 ```
 
 ### Testcontainers 로 실행하기
+
+[Testcontainers](https://www.testcontainers.org/) 는 이름 그대로 테스트를 위한 컨테이너를 실행해주는 라이브러리입니다.
+코드로 컨테이너를 띄우고 종료할 수 있게 해주며 동시에 여러 컨테이너를 올리는 경우 자동으로 임의의 포트로 expose 해주어 각 테스트 케이스간에 서로 다른 컨테이너를 사용하면 독립성을 지킬 수 있습니다.
+또한 테스트 종료 이후 직접 컨테이너를 종료로직을 넣지 않아도 일정기간 활동이 없으면 자동으로 종료해주는 기능이 있습니다.
+
+> 정확이 말하면 라이브러리가 종료하는게 아니고 컨테이너 실행 시 `testcontainers/ryuk` 라는 이름의 컨테이너가 같이 실행되는데 이 컨테이너가 종료를 담당합니다.
+
+**Java, Go, Scala, Node** 등 여러 프로그래밍 언어를 지원하며 그 중 Java 가 가장 많은 star 를 가지고 있습니다.
+Java 라이브러리의 경우 localstack 용 모듈이 따로 있어서 편리하게 이용할 수 있지만 node 그렇지 않아서 직접 설정해야 하는 부분이 존재합니다.
+먼저 아래 명령어로 라이브러리를 설치합니다.
+
+```bash
+$ npm i -D testcontainers
+```
+
+이제 아래 테스트 코드를 작성합니다.
+
+```typescript
+import { GenericContainer, Wait } from "testcontainers";
+import {
+  SendEmailCommand,
+  SESClient,
+  VerifyEmailAddressCommand,
+} from "@aws-sdk/client-ses";
+
+describe("SES 테스트", () => {
+  let localstackPort: number;
+  let container: GenericContainer;
+  const verifiedEmail = "test@email.com";
+  const client = new SESClient({
+    region: "local",
+    endpoint: `http://localhost:${localstackPort}`,
+    credentials: {
+      accessKeyId: "test",
+      secretAccessKey: "test",
+    },
+  });
+
+  beforeAll(async () => {
+    container = await new GenericContainer("localstack/localstack")
+      .withExposedPorts(4566)
+      .withEnv("SERVICES", "ses")
+      .withWaitStrategy(Wait.forLogMessage('Execution of "preload_services"'))
+      .start();
+
+    localstackPort = container.getMappedPort(4566);
+  });
+
+  beforeAll(async () => {
+    const command = new VerifyEmailAddressCommand({
+      EmailAddress: verifiedEmail,
+    });
+    await client.send(command);
+  });
+
+  afterAll(() => container.close());
+
+  it("등록한 전송자 주소로 메일 전송요청 시 성공응답을 받는다", async () => {
+    // given
+    const sendEmailCommand = new SendEmailCommand({
+      Source: verifiedEmail,
+      Destination: {
+        ToAddresses: ["to@test.com"],
+      },
+      Message: {
+        Subject: {
+          Data: "subject",
+        },
+        Body: {
+          Html: {
+            Data: "<strong>text</strong>",
+          },
+        },
+      },
+    });
+
+    // when
+    const response = await client.send(sendEmailCommand);
+
+    // then
+    expect(response.$metadata.httpStatusCode).toBe(200);
+    expect(response.MessageId).toBeTruthy();
+  });
+});
+```
+
+docker compose 를 사용한 코드와 달리 `beforeAll` 부분에 컨테이너를 만들고 이메일을 등록하는 로직이 추가되었고 `afterAll` 에 컨테이너를 종료하는 로직이 추가되었습니다.
