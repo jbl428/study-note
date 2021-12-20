@@ -1,55 +1,68 @@
-import { GenericContainer, Wait } from 'testcontainers';
-import { SendEmailCommand, SESClient, VerifyEmailAddressCommand } from '@aws-sdk/client-ses';
+import { SendEmailCommand, SESClient } from "@aws-sdk/client-ses";
 
-describe('AWS SES', () => {
-  let localstackPort: number;
+describe("SES 테스트", () => {
+  const client = new SESClient({
+    region: "local", // 임의의 region 을 주어도 정상동작합니다.
+    credentials: { secretAccessKey: "test", accessKeyId: "test" }, // 계정정보도 임의의 값을 주어도 정상동작합니다.
+    endpoint: "http://localhost:4566", // localstack 주소로 변경합니다.
+  });
 
-  beforeAll(async () => {
-    const container = await new GenericContainer('localstack/localstack')
-    .withExposedPorts(4566)
-    .withEnv('SERVICES', 'ses')
-    .withWaitStrategy(
-      Wait.forLogMessage('Execution of "preload_services"')
-    )
-    .start();
-
-    localstackPort = container.getMappedPort(4566)
-  })
-
-  it('verify and send mail', async () => {
-    const verifiedEmail = 'test@email.com'
-    const client = new SESClient({
-      region: 'local',
-      endpoint: `http://localhost:${localstackPort}`,
-      credentials: {
-        accessKeyId: 'test',
-        secretAccessKey: 'test',
-      },
-    });
-    const command = new VerifyEmailAddressCommand({
-      EmailAddress: verifiedEmail
-    });
-    await client.send(command);
-
-    const sendEmailCommand = new SendEmailCommand({
-      Source: verifiedEmail,
+  it("등록한 전송자 주소로 메일 전송요청 시 성공응답을 받는다", async () => {
+    // given
+    const from = "test@email.com";
+    const command = new SendEmailCommand({
+      Source: from,
       Destination: {
-        ToAddresses: ['to@test.com']
+        ToAddresses: ["foo@domain.com"],
       },
       Message: {
         Subject: {
-          Data: 'subject'
+          Data: "메일 제목",
+          Charset: "UTF-8",
         },
         Body: {
           Html: {
-            Data: '<strong>text</strong>'
-          }
-        }
-      }
-
+            Data: "메일 내용",
+            Charset: "UTF-8",
+          },
+        },
+      },
     });
-    const response = await client.send(sendEmailCommand );
 
-    expect(response.$metadata.httpStatusCode).toBe(200)
-  })
-})
+    // when
+    const response = await client.send(command);
+
+    // then
+    expect(response.$metadata.httpStatusCode).toBe(200);
+    expect(response.MessageId).toBeTruthy();
+  });
+
+  it("미등록 전송자 주소로 메일 전송요청 시 에러가 발생한다", async () => {
+    // given
+    const from = "invalid@email.com";
+    const command = new SendEmailCommand({
+      Source: from,
+      Destination: {
+        ToAddresses: ["foo@domain.com"],
+      },
+      Message: {
+        Subject: {
+          Data: "메일 제목",
+          Charset: "UTF-8",
+        },
+        Body: {
+          Html: {
+            Data: "메일 내용",
+            Charset: "UTF-8",
+          },
+        },
+      },
+    });
+
+    // when
+    const send = () => client.send(command);
+
+    // then
+    await expect(send).rejects.toThrowError("MessageRejected");
+  });
+});
