@@ -1,11 +1,20 @@
-# Loclastack 을 활용한 통합테스트
+# Localstack 을 활용한 AWS 인프라 통합테스트
 
 이 글은 AWS 서비스를 사용하는 로직의 통합테스트를 위해 `localstack` 을 도입하는 과정을 담고 있습니다.
 
 ## 통합테스트
 
-유닛테스트 만으로는 소프트웨어가 정상적으로 동작함을 보장할 수 없습니다.
-그렇다고 실제 AWS 리소스를 활용하는 경우 다음과 같은 문제가 발생합니다.
+우리는 잘 작동하고 깔끔한 코드를 위해 테스트를 작성합니다.
+테스트는 의존성 여부에 따라 크게 3가지 종류가 있습니다.
+
+- e2e
+- integration
+- unit
+
+이 글에서 다룰 종류는 통합(integration) 테스트로 그 중에서도 aws 리소스와 연동해야 하는 테스트를 다룹니다.
+신규 프로젝트를 진행하면서 `SES` 와 `S3` 서비스가 필요하게 되었고 관련 모듈을 만들게 되었습니다.
+만든 모듈에 대해 유닛테스트를 작성하였지만 유닛 테스트 만으로는 코드가 올바르게 동작함을 보장할 수 없습니다.
+통합테스트가 필요한 상황이지만 테스트를 위해 실제 AWS 리소스를 활용하는 경우 다음과 같은 문제가 발생합니다.
 
 1. 비용
 
@@ -29,12 +38,22 @@
 예로들면 SQS 에 메시지를 넣는 테스트 코드와 빼내는 테스트 코드가 있다면 두 테스트가 동시에 실행되었을 때 타이밍에 따라 빼낸 메시지가 기대했던 값과 달라 때때로 테스트가 실패할 수 있습니다.
 이를 해결하기 위해 각 테스트간 다른 AWS 리소스를 사용하도록 할 수 있지만 리소스를 무한정 늘릴 수 없다는 한계가 있습니다.
 
+이와 같은 문제를 해결하기 위해 이번에 `localstack` 을 도입하였습니다.
+
 ## Localstack
+
+![localstack](./localstack.png)
+
+[localstack](https://localstack.cloud/) 는 aws api 를 시뮬레이션 해주는 프레임워크입니다.
+도커 컨테이너 형태로 제공되며 `aws rest api` 스펙에 맞는 모킹 http 서버를 실행합니다.
+무료버전과 유료버전이 있으며 유료버전은 더 많은 aws 서비스를 제공합니다.
+위 사진처럼 로컬 환경과 CI 환경에서 각각 독립적인 테스트 환경을 구축할 수 있습니다.
+컨테이너를 실행하는 방법으로 docker 를 사용하거나 `testcontainers` 를 사용할 수 있는데 먼저 각각의 장단점을 살펴보려고 합니다.
 
 ## Testcontainers 로 실행하기
 
-테스트를 위한 컨테이너를 띄우는 방법으로 [Testcontainers](https://www.testcontainers.org/) 가 있습니다.
-이 라이브러리는 이름 그대로 테스트를 위한 컨테이너를 실행해줍니다. 
+[Testcontainers](https://www.testcontainers.org/) 이름 그대로 테스트를 위한 컨테이너의 생명주기를 관리해주는 라이브러리입니다.
+즉 컨테이너의 실행과 초기화 대기, 종료를 제어할 수 있습니다.
 `java`, `node.js`, `go` 와 같은 여러 프로그래밍 언어를 지원합니다.
 `node.js` 에서 사용하는 경우 `beforeAll` 이나 `beforeEach` 에 이 라이브러리를 사용해 컨테이너를 올립니다.
 
@@ -221,35 +240,78 @@ describe("SES 테스트", () => {
 
 이처럼 localstack 을 이용해면 통합테스트를 하는데 많은 도움을 받을 수 있지만 몇가지 주의해야 사항이 있습니다.
 
-- SES v2 를 지원하지 않음
+### SES API v2 를 지원하지 않음
 
-본 글의 작성일 기준(2021년 12월) 
+본 글의 작성일 기준(2021년 12월) 으로 아직 SES API 는 v2 버전을 지원하지 않습니다.
+사실 처음 ses 테스트를 위해 v2 버전의 sdk 를 사용했고 테스트 시 아래와 같은 에러가 나왔습니다.
 
-- 순차 실행
+![v2-error](./v2-error.png)
+
+에러 메시지만 봐서는 원인을 파악하기 쉽지 않았습니다. 
+하지만 밑의 stacktrace 를 디깅해보니 원인은 `localstack` 이 아래와 같은 응답을 보냈는데 sdk 가 그것을 JSON 으로 parsing 하다가 에러가 발생한 것이었습니다.
+
+```xml
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<title xmlns="http://ses.amazonaws.com/doc/2010-01-31/">404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
+```
+
+404 에러가 발생했다는 것은 sdk 가 수행한 api 가 `localstack` 에 구현되지 않았다는 것으로 추측했습니다.
+github issue 를 검색해보니 예상대로 v2 버전을 지원하지 않는것을 확인하였습니다.
+
+- https://github.com/localstack/localstack/issues/3179
+
+> 해당 이슈를 보면 최근에 `available-in-pro` 태그가 달린것으로 보아 프로버전은 지원하는 것으로 보입니다.
+
+통합테스트를 포기하고 v2 버전을 사용할 지 아니면 v1 을 사용할지 고민하다가 v1 을 쓰기로 결정하였습니다.
+아직 v1 버전이 deprecated 되지 않았으며 테스트를 통해 안정성을 확보하는 것을 우선하였기 때문입니다.
+
+### 순차 실행과 멱등성
 
 모든 테스트가 하나의 localstack 컨테이너를 사용하기 때문에 독립성을 위해 순차실행을 해야합니다.
 `jest` 에서는 순차실행을 위해 `--runInBand` 옵션을 사용합니다.
+또한 특정 테스트가 `localstack` 의 상태를 변경하는 경우 다른 테스트 실행전에 상태를 되돌리는 작업을 하지 않는다면
+순차실행을 하는 경우라도 테스트가 실패할 수 있습니다.
 
-- CI 에서 localstack 이 완전히 실행된 이후에 테스트 실행해야 함
+### CI 에서 localstack 이 완전히 실행된 이후에 테스트 실행해야 함
 
 localstack 은 컨테이너가 실행된 이후에도 초기화 과정이 필요하기 때문에 컨테이너 실행 후 바로 테스트를 실행 시 실패할 수 있습니다.
 로컬환경에서는 컨테이너를 계속 실행해두기에 문제가 없지만 CI 에서는 매번 실행하기에 문제가 될 수 있습니다.
 이를 해결하기 위해 컨테이너를 최대한 일찍 시작한 후 다른 사전작업을 하면서 완료되기를 기대하거나 
 초기화가 완료될 때까지 주기적으로 localstack 으로 http 요청을 수행해 정상응답이 올 때까지 기다리는 방법이 있습니다.
-다만 주의할 점은 컨테이너의 `/docker-entrypoint-initaws.d` 경로에 스크립트를 넣은경우 http 서버를 띄운 이후에 해당 스크립트를 실행하기 때문에
-이럴때는 컨테이너 로그를 확인해서 해당 스크립트가 실행되었는지 확인해야합니다.
 
+다만 주의할 점은 컨테이너의 `/docker-entrypoint-initaws.d` 경로에 스크립트를 넣은경우 **해당 스크립트는 http 서버가 올라간 이후 실행됩니다.**
+이 경우에는 `localstack` 컨테이너 로그를 지속적으로 확인해서 해당 스크립트가 실행되었는지 확인해야합니다.
+예를 들면 아래와 같은 스크립트의 실행이 필요한 경우
 
+```shell
+#!/bin/sh
+echo "Init localstack"
+awslocal s3 mb s3://test-bucket
+echo "Init localstack finished"
+```
 
-6. AWS 자원을 이용한 통합 테스트 작성의 문제점 (어려운점)
-7. 왜 LocalStack을 선택했는지이
-   1. aws 를 직접 사용하는건 왜 문제가 되는지
-   2. 로컬에서 독립적인 테스트 환경이 왜 필요한 것인지
-8. 왜 테스트 컨테이너가 아닌 docker 로 Localstack 실행을 선택했는지
-9. Localstack 예제 코드 및 사용법
-10. Localstack을 도입하면서 주의해야할 점 (내가 삽질한점)
-    1. 이번에 버전 다운그레이드로 해결한 이슈
-    2. 컨테이너가 완전히 실행되기를 기다린 후 테스트 실행
-11. LocalStack을 도입하면서 얻게된 점 (마치며)
-    1. 중간 중간 LocalStack으로 돌린 테스트 로그와 결과물에 대한 캡쳐 이미지
-    2. 로컬 스택을 통한 통합 테스트 구조를 그린 이미지
+아래 스크립트를 컨테이너를 올린 이후 실행하여 컨테이너 로그에 `Init localstack finished` 가 나올 때까지 기다립니다.
+
+```shell
+#!/bin/sh
+echo "checking if localstack id ready"
+
+while true; do
+  echo "checking localstack..."
+  if docker logs -n 3 localstack 2>&1 | grep -q 'Init localstack finished'; then
+    break
+  fi
+  sleep 3
+done
+```
+
+## 마무리
+
+지금까지 통합테스트를 위한 `localstack` 도입과정을 살펴보았습니다.
+인프런 이직 후 처음으로 aws 와 localstack 을 사용하는 거라 많은 시행착오를 거친것 같습니다.
+`testcontainer` 와 `docker` 로 시작해서 계속해서 trade off 가 있는 선택지가 발생했고 그 중 어떤것이 좋을지 많은 고민을 한것이 기억에 남습니다.
+이 글이 `localstack` 을 도입하려는 누군가에게 도움이 되기를 바라봅니다.
+마지막으로 긴 글 읽어주셔서 감사합니다.
+
