@@ -81,7 +81,7 @@ afterAll(() => container.close());
 
 `testcontainers` 는 여러 컨테이너를 동시에 실행시켜도 외부에 노출되는 포트가 중복되지 않게 해줍니다.  
 따라서 각 테스트 간에 서로 다른 컨테이너에 접속하게 할 수 있기에 병렬실행이 가능하고 테스트 간 독립성이 보장됩니다.  
-하지만 저희는 **testcontainer 대신 docerk-compose 를 활용하기로 결정했고** 그 이유는 다음과 같습니다.
+하지만 저희는 **testcontainer 대신 docker-compose 를 활용하기로 결정했고** 그 이유는 다음과 같습니다.
 
 ### 단건 테스트의 속도가 느려집니다.
 
