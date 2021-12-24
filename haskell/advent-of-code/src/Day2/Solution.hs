@@ -1,3 +1,5 @@
+module Day2.Solution (solve) where
+
 import Data.Maybe (mapMaybe)
 
 data Mode = Forward | Up | Down deriving (Show)
@@ -20,8 +22,8 @@ calc = foldl temp (0, 0, 0)
       Up -> (horizontal, depth, aim - unit)
       Down -> (horizontal, depth, aim + unit)
 
-solution :: String -> Int
-solution = (\(a, b, _) -> a * b) . calc . mapMaybe (toInputs . words) . lines
+solve :: String -> Int
+solve = (\(a, b, _) -> a * b) . calc . mapMaybe (toInputs . words) . lines
 
 main :: IO ()
-main = readFile "input.txt" >>= print . solution
+main = readFile "input.txt" >>= print . solve
