@@ -24,6 +24,3 @@ calc = foldl temp (0, 0, 0)
 
 solve :: String -> Int
 solve = (\(a, b, _) -> a * b) . calc . mapMaybe (toInputs . words) . lines
-
-main :: IO ()
-main = readFile "input.txt" >>= print . solve

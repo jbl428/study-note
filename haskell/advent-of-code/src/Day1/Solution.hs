@@ -12,6 +12,3 @@ solve x = countIncreases 0 $ threeWindowsSum $ read <$> lines x
 threeWindowsSum :: [Int] -> [Int]
 threeWindowsSum (x : y : z : zs) = (x + y + z) : threeWindowsSum (y : z : zs)
 threeWindowsSum _ = []
-
-main :: IO ()
-main = readFile "input.txt" >>= print . solve

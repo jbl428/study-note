@@ -59,4 +59,5 @@ test-suite advent-of-code-test
   build-depends:
       advent-of-code
     , base >=4.7 && <5
+    , hspec
   default-language: Haskell2010
