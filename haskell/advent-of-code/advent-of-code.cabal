@@ -27,7 +27,6 @@ library
   exposed-modules:
       Day1.Solution
       Day2.Solution
-      Lib
   other-modules:
       Paths_advent_of_code
   hs-source-dirs:
