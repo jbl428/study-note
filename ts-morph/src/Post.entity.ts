@@ -21,9 +21,7 @@ export class Post {
   @Column()
   status: string;
 
-  @ManyToOne(() => Profile, {
-    createForeignKeyConstraints: false,
-  })
+  @ManyToOne(() => Profile, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'profile_id', referencedColumnName: 'id' })
   profile: Profile;
 }
