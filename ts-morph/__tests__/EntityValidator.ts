@@ -14,7 +14,7 @@ export class EntityValidator {
     this.#project.addSourceFilesAtPaths(path);
   }
 
-  validate() {
+  validate(): void {
     const sourceFiles = this.#project.getSourceFiles();
 
     sourceFiles.forEach((sourceFile) => {
@@ -38,7 +38,7 @@ export class EntityValidator {
     });
   }
 
-  private getClass(sourceFile: SourceFile) {
+  private getClass(sourceFile: SourceFile): ClassDeclaration {
     const entityClass = sourceFile.getClass((declaration) =>
       declaration
         .getDecorators()
@@ -52,7 +52,7 @@ export class EntityValidator {
     return entityClass;
   }
 
-  private getJoinColumns(entityClass: ClassDeclaration) {
+  private getJoinColumns(entityClass: ClassDeclaration): string[] {
     return entityClass
       .getProperties()
       .filter((property) =>
@@ -66,7 +66,7 @@ export class EntityValidator {
   private getIndexColumns(
     entityClass: ClassDeclaration,
     joinColumns: string[],
-  ) {
+  ): string[] {
     return entityClass
       .getDecorators()
       .filter((decorator) => decorator.getFullName() === 'Index')
