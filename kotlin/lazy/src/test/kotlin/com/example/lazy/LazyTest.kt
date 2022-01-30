@@ -5,6 +5,26 @@ import org.junit.jupiter.api.Test
 
 internal class LazyTest {
     @Test
+    fun `내장 Lazy 테스트`() {
+        // given
+        class Foo {
+            val bar: String by lazy {
+                println("lazy")
+                "bar"
+            }
+
+            init {
+                println("init")
+                println(bar)
+            }
+        }
+
+        // when
+        val foo = Foo()
+        println(foo.bar)
+    }
+
+    @Test
     fun `Lazy 동작 테스트`() {
         // given
         var count = 0
