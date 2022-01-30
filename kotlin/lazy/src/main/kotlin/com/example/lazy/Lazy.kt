@@ -5,14 +5,16 @@ class Lazy<out A>(fn: () -> A) {
     operator fun invoke(): A {
         return value
     }
+
+    fun <B> map(fn: (A) -> B): Lazy<B> = Lazy { fn(value) }
+
+    fun <B> flatMap(fn: (A) -> Lazy<B>): Lazy<B> = Lazy { fn(value)() }
 }
 
 fun or(a: Lazy<Boolean>, b: Lazy<Boolean>) = a() || b()
 
-fun <A, B> map(fn: (A) -> B, fa: Lazy<A>): Lazy<B> = Lazy { fn(fa()) }
-
-fun <A, B> flatMap(fn: (A) -> Lazy<B>, fa: Lazy<A>): Lazy<B> = Lazy { map(fn, fa)()() }
-
 fun <A, B, C> map2(fn: (A, B) -> C, fa: Lazy<A>, fb: Lazy<B>): Lazy<C> = Lazy {
     fn(fa(), fb())
 }
+
+fun <A> sequence(list: List<Lazy<A>>): Lazy<List<A>> = Lazy { list.map { it() } }

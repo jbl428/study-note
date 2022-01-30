@@ -34,7 +34,7 @@ internal class LazyTest {
         }
 
         // when
-        val result = map({ a -> a + 10 }, lazy)
+        val result = lazy.map { a -> a + 10 }
 
         // then
         assertEquals(count, 0)
@@ -52,7 +52,7 @@ internal class LazyTest {
         }
 
         // when
-        val result = flatMap({ a -> Lazy { a + 10 } }, lazy)
+        val result = lazy.flatMap { a -> Lazy { a + 10 } }
 
         // then
         assertEquals(count, 0)
@@ -72,6 +72,7 @@ internal class LazyTest {
             count++
             20
         }
+
         fun add(a: Int, b: Int): Int = a + b
 
         // when
@@ -81,5 +82,25 @@ internal class LazyTest {
         assertEquals(count, 0)
         assertEquals(result(), 30)
         assertEquals(count, 2)
+    }
+
+    @Test
+    fun `Sequence 동작 테스트`() {
+        // given
+        var count = 0
+        val list = (1..10).map {
+            Lazy {
+                count++
+                it
+            }
+        }
+
+        // when
+        val result = sequence(list)
+
+        // then
+        assertEquals(count, 0)
+        assertEquals(result(), (1..10).toList())
+        assertEquals(count, 10)
     }
 }
