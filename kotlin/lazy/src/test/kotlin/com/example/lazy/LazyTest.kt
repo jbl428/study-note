@@ -58,6 +58,8 @@ internal class LazyTest {
         assertEquals(count, 0)
         assertEquals(result(), 20)
         assertEquals(count, 1)
+        result()
+        assertEquals(count, 1)
     }
 
     @Test
@@ -82,6 +84,8 @@ internal class LazyTest {
         assertEquals(count, 0)
         assertEquals(result(), 30)
         assertEquals(count, 2)
+        result()
+        assertEquals(count, 2)
     }
 
     @Test
@@ -101,6 +105,8 @@ internal class LazyTest {
         // then
         assertEquals(count, 0)
         assertEquals(result(), (1..10).toList())
+        assertEquals(count, 10)
+        result()
         assertEquals(count, 10)
     }
 }
