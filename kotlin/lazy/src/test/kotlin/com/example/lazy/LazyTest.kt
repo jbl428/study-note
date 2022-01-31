@@ -1,6 +1,8 @@
 package com.example.lazy
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class LazyTest {
@@ -25,11 +27,9 @@ internal class LazyTest {
     }
 
     @Test
-    fun `Lazy 동작 테스트`() {
+    fun `Or 동작 테스트`() {
         // given
-        var count = 0
         val lazyA = Lazy {
-            count++
             true
         }
         val lazyB = Lazy<Boolean> {
@@ -37,11 +37,27 @@ internal class LazyTest {
         }
 
         // when
-        lazyA() || lazyB()
-        or(lazyA, lazyB)
+        val result = lazyA() || lazyB()
 
         // then
-        assertEquals(1, count)
+        assertTrue(result)
+    }
+
+    @Test
+    fun `And 동작 테스트`() {
+        // given
+        val lazyA = Lazy {
+            false
+        }
+        val lazyB = Lazy<Boolean> {
+            throw Error("error")
+        }
+
+        // when
+        val result = lazyA() && lazyB()
+
+        // then
+        assertFalse(result)
     }
 
     @Test
