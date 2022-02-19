@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  typeorm:
+    image: postgres
+    ports:
+      - "5432:5432"
+    container_name: typeorm-db
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+
+  mikroorm:
+    image: postgres
+    ports:
+      - "5433:5432"
+    container_name: mikroorm-db
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
