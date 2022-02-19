@@ -3,21 +3,11 @@ import { MikroormController } from './mikroorm.controller';
 import { MikroormService } from './mikroorm.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PostModule } from './post/post.module';
-import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { CommentModule } from './comment/comment.module';
+import config from './mikro-orm.config';
 
 @Module({
-  imports: [
-    MikroOrmModule.forRoot({
-      type: 'postgresql',
-      user: 'test',
-      password: 'test',
-      dbName: 'test',
-      metadataProvider: TsMorphMetadataProvider,
-    }),
-    PostModule,
-    CommentModule,
-  ],
+  imports: [MikroOrmModule.forRoot(config), PostModule, CommentModule],
   controllers: [MikroormController],
   providers: [MikroormService],
 })
