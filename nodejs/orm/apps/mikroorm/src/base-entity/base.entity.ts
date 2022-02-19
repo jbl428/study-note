@@ -1,12 +1,19 @@
-import { BigIntType, PrimaryKey, Property } from '@mikro-orm/core';
+import { PrimaryKey, Property } from '@mikro-orm/core';
+import { LocalDateTimeType } from '../type/local-date-time-type';
+import { LocalDateTime } from '@js-joda/core';
+import { NativeBigintType } from '../type/native-bigint-type';
 
 export abstract class BaseEntity {
-  @PrimaryKey({ type: BigIntType })
-  id: string;
+  @PrimaryKey({ type: NativeBigintType })
+  id: bigint;
 
-  @Property()
-  createdAt: Date = new Date();
+  @Property({ type: LocalDateTimeType, onCreate: () => LocalDateTime.now() })
+  createdAt: LocalDateTime;
 
-  @Property({ onUpdate: () => new Date() })
-  updatedAt: Date = new Date();
+  @Property({
+    type: LocalDateTimeType,
+    onCreate: () => LocalDateTime.now(),
+    onUpdate: () => LocalDateTime.now(),
+  })
+  updatedAt: LocalDateTime;
 }
