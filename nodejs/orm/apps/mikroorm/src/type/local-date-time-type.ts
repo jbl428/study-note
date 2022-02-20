@@ -25,6 +25,6 @@ export class LocalDateTimeType extends Type<LocalDateTime, Date> {
   }
 
   getColumnType(prop: EntityProperty, platform: Platform) {
-    return `timestampz`;
+    return `timestamptz`;
   }
 }

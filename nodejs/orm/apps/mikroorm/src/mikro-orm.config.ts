@@ -12,14 +12,16 @@ class CustomMigrationGenerator extends TSMigrationGenerator {
 }
 
 const config: MikroOrmModuleOptions = {
-  entities: ['dist/apps/mikroorm/**/*.entity.js'],
-  entitiesTs: ['apps/mikroorm/src/**/*.entity.ts'],
   type: 'postgresql',
   user: 'test',
   password: 'test',
   dbName: 'test',
   port: 5432,
   metadataProvider: TsMorphMetadataProvider,
+  autoLoadEntities: true,
+  schemaGenerator: {
+    createForeignKeyConstraints: false,
+  },
   migrations: {
     disableForeignKeys: true,
     path: 'migrations',

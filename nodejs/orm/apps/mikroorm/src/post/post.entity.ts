@@ -1,5 +1,6 @@
-import { Entity, Property } from '@mikro-orm/core';
+import { Collection, Entity, OneToMany, Property } from '@mikro-orm/core';
 import { BaseEntity } from '../base-entity/base.entity';
+import { Comment } from '../comment/comment.entity';
 
 @Entity()
 export class Post extends BaseEntity {
@@ -11,4 +12,7 @@ export class Post extends BaseEntity {
 
   @Property()
   memo?: string;
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments = new Collection<Comment>(this);
 }
