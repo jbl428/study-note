@@ -11,6 +11,7 @@ import { PostFactory } from '../src/factory/post-factory';
 import { CommentFactory } from '../src/factory/comment-factory';
 import { convert, LocalDateTime } from '@js-joda/core';
 import { Comment } from '../src/comment/comment.entity';
+import { PostStatus } from '../src/post/post-status';
 
 describe('MikroORM', () => {
   let postEntityRepository: EntityRepository<Post>;
@@ -66,6 +67,25 @@ describe('MikroORM', () => {
   });
 
   describe('LocalDateTime', () => {
+    it('repository 사용하는 경우 정상적으로 동작한다 ', async () => {
+      // given
+      const createdAt = LocalDateTime.of(2022, 2, 1);
+      const post = postFactory.makeOne({ createdAt });
+      post.comments.add(...commentFactory.make(5));
+      await postEntityRepository.persistAndFlush(post);
+      orm.em.clear();
+
+      // when
+      const result = await postEntityRepository.findOneOrFail(
+        { createdAt: { $gte: createdAt } },
+        { populate: ['comments'] },
+      );
+
+      // then
+      expect(result.id).toBe(post.id);
+      expect(result.comments).toHaveLength(5);
+    });
+
     it('filterQuery 사용하는 경우 정상적으로 동작한다', async () => {
       // given
       const createdAt = LocalDateTime.of(2022, 2, 1);
@@ -111,6 +131,56 @@ describe('MikroORM', () => {
       const result = await postEntityRepository
         .createQueryBuilder('post')
         .where({ 'post.createdAt': { $gte: convert(createdAt).toDate() } })
+        .getSingleResult();
+
+      // then
+      expect(result?.id).toBe(post.id);
+    });
+  });
+
+  describe('EClass', () => {
+    it('filterQuery 사용하는 경우 정상적으로 동작한다', async () => {
+      // given
+      const status = PostStatus.PRIVATE;
+      const post = postFactory.makeOne({ status });
+      await postEntityRepository.persistAndFlush(post);
+
+      // when
+      const result = await postEntityRepository
+        .createQueryBuilder('post')
+        .where({ status: { $eq: status } })
+        .getSingleResult();
+
+      // then
+      expect(result).toBe(post);
+    });
+
+    it('string cond 사용하는 경우 정상적으로 동작한다', async () => {
+      // given
+      const status = PostStatus.PUBLIC;
+      const post = postFactory.makeOne({ status });
+      await postEntityRepository.persistAndFlush(post);
+
+      // when
+      const result = await postEntityRepository
+        .createQueryBuilder('post')
+        .where('post.status = ?', [status.code])
+        .getSingleResult();
+
+      // then
+      expect(result?.id).toBe(post.id);
+    });
+
+    it('alias 있는 queryFilter 사용하는 경우 정상적으로 동작한다', async () => {
+      // given
+      const status = PostStatus.PUBLIC;
+      const post = postFactory.makeOne({ status });
+      await postEntityRepository.persistAndFlush(post);
+
+      // when
+      const result = await postEntityRepository
+        .createQueryBuilder('post')
+        .where({ 'post.status': { $eq: status.code } })
         .getSingleResult();
 
       // then

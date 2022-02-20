@@ -28,6 +28,7 @@ const config: MikroOrmModuleOptions = {
     pathTs: 'migrations',
     generator: CustomMigrationGenerator,
   },
+  replicas: [{ port: 5432 }],
 };
 
 export default config;
