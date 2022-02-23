@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Post } from '../src/post/post.entity';
-import { MikroORM } from '@mikro-orm/core';
+import { LoadStrategy, MikroORM } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import config from '../src/mikro-orm.config';
 import { PostModule } from '../src/post/post.module';
@@ -220,12 +220,14 @@ describe('MikroORM', () => {
         {
           populate: ['post'],
           // fields: ['id', 'like', 'post', { post: ['name'] }],
+          strategy: LoadStrategy.JOINED,
           fields: ['id', 'like', 'post', 'post.name'],
         },
       );
 
       // then
-      expect(result?.post.id).toBe(post.id);
+      expect(result?.post.isInitialized()).toBe(true);
+      expect(result?.post.unwrap().name).toBe(post.name);
     });
 
     it('queryBuilder 로 join 관계 테이블 컬럼 직접 지정해서 select', async () => {
@@ -243,7 +245,8 @@ describe('MikroORM', () => {
         .getSingleResult();
 
       // then
-      expect(result?.post.name).toBeUndefined();
+      expect(result?.post.isInitialized()).toBe(false);
+      expect(result?.post.unwrap().name).toBeUndefined();
     });
   });
 
