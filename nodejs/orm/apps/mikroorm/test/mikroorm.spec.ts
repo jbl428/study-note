@@ -246,4 +246,30 @@ describe('MikroORM', () => {
       expect(result?.post.name).toBeUndefined();
     });
   });
+
+  it('transaction 테스트', async () => {
+    // given
+    const post = postFactory.makeOne();
+    post.comments.add(...commentFactory.make(5));
+    await postEntityRepository.persistAndFlush(post);
+    orm.em.clear();
+    const newPost = await postEntityRepository.findOneOrFail(post.id, {
+      populate: ['comments'],
+    });
+
+    // when
+    await orm.em.transactional(async () => {
+      newPost.content = 'new content';
+      newPost.comments[0]!.like = 12345;
+    });
+
+    // then
+    orm.em.clear();
+    const postResult = await postEntityRepository.findOneOrFail(post.id);
+    const commentResult = await commentEntityRepository.findOneOrFail(
+      post.comments[0]?.id || 0n,
+    );
+    expect(postResult.content).toBe('new content');
+    expect(commentResult.like).toBe(12345);
+  });
 });
