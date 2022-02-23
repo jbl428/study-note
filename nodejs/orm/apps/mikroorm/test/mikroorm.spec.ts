@@ -187,4 +187,63 @@ describe('MikroORM', () => {
       expect(result?.id).toBe(post.id);
     });
   });
+
+  describe('select', () => {
+    it('inner join 없이 post_id 로 where 조건에 넣어 검색한다', async () => {
+      // given
+      const post = postFactory.makeOne();
+      post.comments.add(...commentFactory.make(5));
+      await postEntityRepository.persistAndFlush(post);
+      orm.em.clear();
+
+      // when
+      const result = await commentEntityRepository
+        .createQueryBuilder('comment')
+        .select(['id', 'post'])
+        .where({ post: { id: post.id } })
+        .getSingleResult();
+
+      // then
+      expect(result?.post.id).toBe(post.id);
+    });
+
+    it('join 관계 테이블 컬럼 직접 지정해서 select', async () => {
+      // given
+      const post = postFactory.makeOne();
+      post.comments.add(...commentFactory.make(5));
+      await postEntityRepository.persistAndFlush(post);
+      orm.em.clear();
+
+      // when
+      const result = await commentEntityRepository.findOneOrFail(
+        { post: { id: { $lte: post.id } } },
+        {
+          populate: ['post'],
+          // fields: ['id', 'like', 'post', { post: ['name'] }],
+          fields: ['id', 'like', 'post', 'post.name'],
+        },
+      );
+
+      // then
+      expect(result?.post.id).toBe(post.id);
+    });
+
+    it('queryBuilder 로 join 관계 테이블 컬럼 직접 지정해서 select', async () => {
+      // given
+      const post = postFactory.makeOne();
+      post.comments.add(...commentFactory.make(5));
+      await postEntityRepository.persistAndFlush(post);
+      orm.em.clear();
+
+      // when
+      const result = await commentEntityRepository
+        .createQueryBuilder('c')
+        .select(['c.id', 'c.like', 'post', 'p.name'])
+        .join('c.post', 'p')
+        .getSingleResult();
+
+      // then
+      expect(result?.post.name).toBeUndefined();
+    });
+  });
 });
