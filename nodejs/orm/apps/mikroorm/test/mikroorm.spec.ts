@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Post } from '../src/post/post.entity';
 import { LoadStrategy, MikroORM } from '@mikro-orm/core';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { getRepositoryToken, MikroOrmModule } from '@mikro-orm/nestjs';
 import config from '../src/mikro-orm.config';
 import { PostModule } from '../src/post/post.module';
 import { CommentModule } from '../src/comment/comment.module';
