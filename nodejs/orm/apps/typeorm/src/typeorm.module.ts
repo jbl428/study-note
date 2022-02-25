@@ -15,6 +15,7 @@ import { CommentModule } from './comment/comment.module';
       port: 5433,
       synchronize: true,
       autoLoadEntities: true,
+      logging: true,
     }),
     PostModule,
     CommentModule,

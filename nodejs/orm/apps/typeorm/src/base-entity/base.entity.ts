@@ -9,10 +9,14 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
 export abstract class BaseEntity {
   @Generated('increment')
   @PrimaryColumn({ type: 'bigint', transformer: new NativeBigintType() })
-  id: number;
+  id: bigint;
 
   @Column({
     type: 'timestamptz',

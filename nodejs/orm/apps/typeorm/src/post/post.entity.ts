@@ -18,6 +18,6 @@ export class Post extends BaseEntity {
   @Column({ nullable: true })
   memo?: string;
 
-  @OneToMany(() => Comment, (comment) => comment.post)
+  @OneToMany(() => Comment, (comment) => comment.post, { cascade: ['insert'] })
   comments: Comment[];
 }

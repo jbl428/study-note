@@ -225,8 +225,8 @@ describe('MikroORM', () => {
       );
 
       // then
-      expect(result?.post.isInitialized()).toBe(true);
-      expect(result?.post.unwrap().name).toBe(post.name);
+      expect(result.post.isInitialized()).toBe(true);
+      expect(result.post.unwrap().name).toBe(post.name);
     });
 
     it('queryBuilder 로 join 관계 테이블 컬럼 직접 지정해서 select', async () => {
