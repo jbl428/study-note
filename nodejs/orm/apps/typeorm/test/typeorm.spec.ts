@@ -215,4 +215,21 @@ describe('TypeORM', () => {
     // then
     await expect(update).rejects.toThrowError('violates not-null constraint');
   });
+
+  it('save 에 json 으로 전달하면 BeforeInsert hook 이 동작하지 않는다', async () => {
+    // given
+    const post = PostFactory.make();
+    const createdAt = LocalDateTime.of(2000, 1, 1);
+
+    // when
+    await postRepository.save({
+      ...post,
+      createdAt,
+      updatedAt: LocalDateTime.now(),
+    });
+
+    // then
+    const postResult = await postRepository.findOneOrFail();
+    expect(postResult.createdAt.equals(createdAt)).toBe(true);
+  });
 });
