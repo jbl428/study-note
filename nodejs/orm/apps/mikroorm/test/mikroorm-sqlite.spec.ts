@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EntityRepository } from '@mikro-orm/postgresql';
+import { EntityRepository } from '@mikro-orm/sqlite';
 import { Post } from '../src/post/post.entity';
 import { LoadStrategy, MikroORM } from '@mikro-orm/core';
 import { getRepositoryToken, MikroOrmModule } from '@mikro-orm/nestjs';
@@ -12,7 +12,7 @@ import { convert, LocalDateTime } from '@js-joda/core';
 import { Comment } from '../src/comment/comment.entity';
 import { PostStatus } from '../src/post/post-status';
 
-describe('MikroORM (postgresql)', () => {
+describe('MikroORM (sqlite)', () => {
   let postEntityRepository: EntityRepository<Post>;
   let commentEntityRepository: EntityRepository<Comment>;
   let orm: MikroORM;
@@ -24,6 +24,7 @@ describe('MikroORM (postgresql)', () => {
       imports: [
         MikroOrmModule.forRoot({
           ...config,
+          type: 'sqlite',
           allowGlobalContext: true,
           debug: true,
         }),
@@ -104,7 +105,7 @@ describe('MikroORM (postgresql)', () => {
     it('string cond 사용하는 경우 정상적으로 동작한다', async () => {
       // given
       LocalDateTime.prototype.toJSON = function () {
-        return convert(this).toDate().toISOString();
+        return convert(this).toDate().getTime() as any;
       };
       const createdAt = LocalDateTime.of(2022, 2, 1);
       const post = postFactory.makeOne({ createdAt });

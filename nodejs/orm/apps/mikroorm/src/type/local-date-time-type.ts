@@ -21,6 +21,10 @@ export class LocalDateTimeType extends Type<LocalDateTime, Date> {
       return value;
     }
 
+    if (typeof value === 'number') {
+      return LocalDateTime.from(nativeJs(new Date(value)));
+    }
+
     return LocalDateTime.from(nativeJs(value));
   }
 
