@@ -12,6 +12,7 @@ export class PostFactory extends Factory<Post> {
       memo: faker.lorem.sentence(3),
       status: PostStatus.PUBLIC,
       extra: { foo: 'bar' },
+      someIds: [],
     };
   }
 }

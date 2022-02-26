@@ -1,4 +1,10 @@
-import { Collection, Entity, OneToMany, Property } from '@mikro-orm/core';
+import {
+  ArrayType,
+  Collection,
+  Entity,
+  OneToMany,
+  Property,
+} from '@mikro-orm/core';
 import { BaseEntity } from '../base-entity/base.entity';
 import { Comment } from '../comment/comment.entity';
 import { PostStatus } from './post-status';
@@ -20,6 +26,9 @@ export class Post extends BaseEntity {
 
   @Property({ type: 'json' })
   extra: Record<string, unknown>;
+
+  @Property({ type: new ArrayType((i) => +i) })
+  someIds: number[];
 
   @OneToMany(() => Comment, (comment) => comment.post)
   comments = new Collection<Comment>(this);

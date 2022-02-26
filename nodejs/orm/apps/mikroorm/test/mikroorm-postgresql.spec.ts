@@ -52,7 +52,7 @@ describe('MikroORM (postgresql)', () => {
   it('정상적으로 저장한다', async () => {
     // given
     const extra = { foo: 'text', bar: [true, 1] };
-    const post = postFactory.makeOne({ extra });
+    const post = postFactory.makeOne({ extra, someIds: [1, 2, 3] });
     post.comments.add(...commentFactory.make(5));
 
     // when
