@@ -202,16 +202,17 @@ describe('TypeORM', () => {
   it('transaction 테스트', async () => {
     // given
     const post = PostFactory.make();
+    post.comments = [CommentFactory.make(), CommentFactory.make()];
     await postRepository.save(post);
 
     // when
-    await getManager().transaction(async (manager) => {
-      post.content = 'new content';
-      await manager.save(post);
-    });
+    const update = () =>
+      getManager().transaction(async (manager) => {
+        post.content = 'new content';
+        await manager.save(post);
+      });
 
     // then
-    const postResult = await postRepository.findOneOrFail(`${post.id}`);
-    expect(postResult.content).toBe('new content');
+    await expect(update).rejects.toThrowError('violates not-null constraint');
   });
 });

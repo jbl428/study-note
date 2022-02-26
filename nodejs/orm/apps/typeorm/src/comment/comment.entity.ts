@@ -13,7 +13,7 @@ export class Comment extends BaseEntity {
   @Column({ nullable: true })
   memo?: string;
 
-  @ManyToOne(() => Post, {
+  @ManyToOne(() => Post, (post) => post.comments, {
     createForeignKeyConstraints: false,
     nullable: false,
   })
