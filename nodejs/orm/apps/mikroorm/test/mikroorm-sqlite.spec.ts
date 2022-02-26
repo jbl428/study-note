@@ -52,7 +52,8 @@ describe('MikroORM (sqlite)', () => {
 
   it('정상적으로 저장한다', async () => {
     // given
-    const post = postFactory.makeOne();
+    const extra = { foo: 'text', bar: [true, 1] };
+    const post = postFactory.makeOne({ extra });
     post.comments.add(...commentFactory.make(5));
 
     // when

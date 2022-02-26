@@ -18,6 +18,9 @@ export class Post extends BaseEntity {
   @Property()
   memo?: string;
 
+  @Property({ type: 'json' })
+  extra: Record<string, unknown>;
+
   @OneToMany(() => Comment, (comment) => comment.post)
   comments = new Collection<Comment>(this);
 }
