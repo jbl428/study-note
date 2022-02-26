@@ -1,6 +1,7 @@
 module Day2.Solution (solve) where
 
 import Data.Maybe (mapMaybe)
+import Flow ((|>))
 
 data Mode = Forward | Up | Down deriving (Show)
 
@@ -23,4 +24,10 @@ calc = foldl temp (0, 0, 0)
       Down -> (horizontal, depth, aim + unit)
 
 solve :: String -> Int
-solve = (\(a, b, _) -> a * b) . calc . mapMaybe (toInputs . words) . lines
+-- solve = (\(a, b, _) -> a * b) . calc . mapMaybe (toInputs . words) . lines
+solve x =
+  x
+    |> lines
+    |> mapMaybe (toInputs . words)
+    |> calc
+    |> (\(a, b, _) -> a * b)

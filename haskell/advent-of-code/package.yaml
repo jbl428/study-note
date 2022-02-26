@@ -21,6 +21,7 @@ description: Please see the README on GitHub at <https://github.com/jbl428/adven
 
 dependencies:
   - base >= 4.7 && < 5
+  - flow
 
 library:
   source-dirs: src
