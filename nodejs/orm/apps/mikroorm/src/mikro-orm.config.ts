@@ -29,6 +29,12 @@ const config: MikroOrmModuleOptions = {
     generator: CustomMigrationGenerator,
   },
   replicas: [{ port: 5432 }],
+  driverOptions: {
+    connection: {
+      statement_timeout: 3000,
+      query_timeout: 3000,
+    },
+  },
 };
 
 export default config;
