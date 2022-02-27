@@ -72,12 +72,10 @@ describe('TypeORM', () => {
       const createdAt = LocalDateTime.of(2022, 2, 1);
       const post = PostFactory.make({ createdAt });
       post.comments = [CommentFactory.make(), CommentFactory.make()];
-      console.log(
-        await postRepository.save({
-          ...post,
-          updatedAt: LocalDateTime.now(),
-        }),
-      );
+      await postRepository.save({
+        ...post,
+        updatedAt: LocalDateTime.now(),
+      });
 
       // when
       const result = await postRepository
