@@ -17,7 +17,7 @@ export class Comment extends BaseEntity {
     createForeignKeyConstraints: false,
     nullable: false,
   })
-  @Index()
+  @Index('idx_post_id')
   @JoinColumn({ name: 'post_id', referencedColumnName: 'id' })
   post: Post;
 }

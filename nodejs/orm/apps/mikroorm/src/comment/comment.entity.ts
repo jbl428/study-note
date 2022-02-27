@@ -19,7 +19,7 @@ export class Comment extends BaseEntity {
   @Property()
   memo?: string;
 
-  @ManyToOne()
+  @ManyToOne({ index: true })
   post: IdentifiedReference<Post>;
 
   // @ManyToOne(() => Post, { mapToPk: true })
