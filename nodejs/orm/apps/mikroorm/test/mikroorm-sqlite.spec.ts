@@ -3,7 +3,6 @@ import { EntityRepository } from '@mikro-orm/sqlite';
 import { Post } from '../src/post/post.entity';
 import { LoadStrategy, MikroORM } from '@mikro-orm/core';
 import { getRepositoryToken, MikroOrmModule } from '@mikro-orm/nestjs';
-import config from '../src/mikro-orm.config';
 import { PostModule } from '../src/post/post.module';
 import { CommentModule } from '../src/comment/comment.module';
 import { PostFactory } from '../src/factory/post-factory';
@@ -11,6 +10,7 @@ import { CommentFactory } from '../src/factory/comment-factory';
 import { convert, LocalDateTime } from '@js-joda/core';
 import { Comment } from '../src/comment/comment.entity';
 import { PostStatus } from '../src/post/post-status';
+import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 
 describe('MikroORM (sqlite)', () => {
   let postEntityRepository: EntityRepository<Post>;
@@ -23,10 +23,15 @@ describe('MikroORM (sqlite)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         MikroOrmModule.forRoot({
-          ...config,
           type: 'sqlite',
+          dbName: ':memory:',
           allowGlobalContext: true,
           debug: true,
+          metadataProvider: TsMorphMetadataProvider,
+          autoLoadEntities: true,
+          schemaGenerator: {
+            createForeignKeyConstraints: false,
+          },
         }),
         PostModule,
         CommentModule,
