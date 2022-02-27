@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EntityRepository } from '@mikro-orm/sqlite';
+import { EntityRepository } from '@mikro-orm/better-sqlite';
 import { Post } from '../src/post/post.entity';
 import { LoadStrategy, MikroORM } from '@mikro-orm/core';
 import { getRepositoryToken, MikroOrmModule } from '@mikro-orm/nestjs';
@@ -23,7 +23,7 @@ describe('MikroORM (sqlite)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         MikroOrmModule.forRoot({
-          type: 'sqlite',
+          type: 'better-sqlite',
           dbName: ':memory:',
           allowGlobalContext: true,
           debug: true,

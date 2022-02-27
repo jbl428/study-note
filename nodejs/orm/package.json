@@ -27,7 +27,6 @@
     "@mikro-orm/nestjs": "^5.0.0",
     "@mikro-orm/postgresql": "^5.0.4",
     "@mikro-orm/reflection": "^5.0.4",
-    "@mikro-orm/sqlite": "^5.0.4",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
@@ -39,6 +38,7 @@
     "typeorm": "^0.2.43"
   },
   "devDependencies": {
+    "@mikro-orm/better-sqlite": "^5.0.4",
     "@mikro-orm/cli": "^5.0.4",
     "@mikro-orm/seeder": "^5.0.4",
     "@nestjs/cli": "^8.0.0",
