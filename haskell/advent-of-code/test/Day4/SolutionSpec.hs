@@ -1,6 +1,7 @@
 module Day4.SolutionSpec where
 
-import Day4.Solution (BingoResult (..), getResult)
+import Day4.Solution (BingoResult (..), getResult, numberOfCountToBingo)
+import Flow ((|>))
 import Test.Hspec (Spec, describe, it, shouldBe)
 
 numbers :: [Int]
@@ -36,5 +37,13 @@ boardC =
 spec :: Spec
 spec = do
   describe "Day 4" $ do
+    it "numberOfCountToBingo" $ do
+      numberOfCountToBingo [] [1, 2] `shouldBe` Nothing
+      numberOfCountToBingo [1, 2] [] `shouldBe` Nothing
+      numberOfCountToBingo [1, 2] [3, 4] `shouldBe` Nothing
+      numberOfCountToBingo [1, 2] [1, 2] `shouldBe` Just 2
+      numberOfCountToBingo [1, 2] [1, 3, 1, 2, 2] `shouldBe` Just 4
     it "getResult" $ do
       getResult boardA [] `shouldBe` Lose
+
+-- getResult boardA [22, 13, 17, 11, 0] `shouldBe` Win 5 (boardA |> tail |> concat |> sum)
