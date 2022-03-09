@@ -1,6 +1,6 @@
 module Day4.SolutionSpec where
 
-import Day4.Solution (BingoResult (..), getResult, numberOfCountToBingo)
+import Day4.Solution (BingoResult (..), bingoCount, getResult, numberOfCountToBingo)
 import Flow ((|>))
 import Test.Hspec (Spec, describe, it, shouldBe)
 
@@ -42,8 +42,15 @@ spec = do
       numberOfCountToBingo [1, 2] [] `shouldBe` Nothing
       numberOfCountToBingo [1, 2] [3, 4] `shouldBe` Nothing
       numberOfCountToBingo [1, 2] [1, 2] `shouldBe` Just 2
-      numberOfCountToBingo [1, 2] [1, 3, 1, 2, 2] `shouldBe` Just 4
+      numberOfCountToBingo [1, 3, 0, 1, 2, 2] [1, 2, 3] `shouldBe` Just 5
+
+    it "bingoCount" $ do
+      bingoCount boardA [] `shouldBe` Nothing
+      bingoCount boardA [22, 13, 17, 0, 11] `shouldBe` Just 5
+      bingoCount boardB [22, 13, 17, 5, 23, 4, 1, 5, 6, 10] `shouldBe` Just 9
+      bingoCount boardC [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24] `shouldBe` Just 12
+
     it "getResult" $ do
       getResult boardA [] `shouldBe` Lose
-
--- getResult boardA [22, 13, 17, 11, 0] `shouldBe` Win 5 (boardA |> tail |> concat |> sum)
+      getResult boardA [22, 13, 17, 0, 11] `shouldBe` Win 5 (boardA |> tail |> concat |> sum |> (* 11))
+      getResult boardC [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24] `shouldBe` Win 12 (188 * 24)
