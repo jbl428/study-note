@@ -3,16 +3,16 @@ module Day4.Solution
     bingoCount,
     getResult,
     numberOfCountToBingo,
-    parsePuzzleInput,
+    solvePart1,
   )
 where
 
 import Control.Monad (guard)
-import Data.List (elemIndex, transpose, (\\))
+import Data.List (elemIndex, minimumBy, transpose, (\\))
 import Data.List.NonEmpty (nonEmpty, toList)
-import Data.Maybe (catMaybes)
+import Data.Maybe (catMaybes, mapMaybe)
 import Flow ((|>))
-import Text.Parsec (char, count, digit, many1, newline, sepBy1, sepEndBy1, skipMany, spaces)
+import Text.Parsec (ParseError, char, count, digit, many1, newline, parse, sepBy1, sepEndBy1, skipMany, spaces)
 import Text.Parsec.String (Parser)
 
 type Count = Int
@@ -41,8 +41,8 @@ bingoCount board inputs =
     |> nonEmpty
     |> fmap minimum
 
-getResult :: Board -> Inputs -> BingoResult
-getResult board inputs =
+getResult :: Inputs -> Board -> BingoResult
+getResult inputs board =
   case bingoCount board inputs of
     Just count -> Win count (getScore count)
     _ -> Lose
@@ -69,3 +69,16 @@ parsePuzzleInput = do
   newline
   boards <- sepEndBy1 parseBoard newline
   return (inputs, boards)
+
+solvePart1 :: String -> Either ParseError Score
+solvePart1 content = do
+  (inputs, boards) <- parse parsePuzzleInput "" content
+  let (_, score) =
+        boards
+          |> mapMaybe
+            ( \board -> case getResult inputs board of
+                (Win c s) -> Just (c, s)
+                _ -> Nothing
+            )
+          |> minimumBy (\a b -> compare (fst a) (fst b))
+  return score
