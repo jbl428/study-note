@@ -1,11 +1,12 @@
 module Day4.SolutionSpec where
 
-import Day4.Solution (BingoResult (..), bingoCount, getResult, numberOfCountToBingo)
+import Day4.Solution (BingoResult (..), bingoCount, getResult, numberOfCountToBingo, parsePuzzleInput)
 import Flow ((|>))
 import Test.Hspec (Spec, describe, it, shouldBe)
+import Text.Parsec (parse)
 
-numbers :: [Int]
-numbers = [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6, 15, 25, 12, 22, 18, 20, 8, 19, 3, 26, 1]
+inputs :: [Int]
+inputs = [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24, 10, 16, 13, 6, 15, 25, 12, 22, 18, 20, 8, 19, 3, 26, 1]
 
 boardA :: [[Int]]
 boardA =
@@ -48,9 +49,9 @@ spec = do
       bingoCount boardA [] `shouldBe` Nothing
       bingoCount boardA [22, 13, 17, 0, 11] `shouldBe` Just 5
       bingoCount boardB [22, 13, 17, 5, 23, 4, 1, 5, 6, 10] `shouldBe` Just 9
-      bingoCount boardC [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24] `shouldBe` Just 12
+      bingoCount boardC inputs `shouldBe` Just 12
 
     it "getResult" $ do
       getResult boardA [] `shouldBe` Lose
       getResult boardA [22, 13, 17, 0, 11] `shouldBe` Win 5 (boardA |> tail |> concat |> sum |> (* 11))
-      getResult boardC [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24] `shouldBe` Win 12 (188 * 24)
+      getResult boardC inputs `shouldBe` Win 12 (188 * 24)

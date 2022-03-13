@@ -36,6 +36,7 @@ library
   build-depends:
       base >=4.7 && <5
     , flow
+    , parsec
   default-language: Haskell2010
 
 executable advent-of-code-exe
@@ -49,6 +50,7 @@ executable advent-of-code-exe
       advent-of-code
     , base >=4.7 && <5
     , flow
+    , parsec
   default-language: Haskell2010
 
 test-suite advent-of-code-test
@@ -68,4 +70,5 @@ test-suite advent-of-code-test
     , base >=4.7 && <5
     , flow
     , hspec
+    , parsec
   default-language: Haskell2010
