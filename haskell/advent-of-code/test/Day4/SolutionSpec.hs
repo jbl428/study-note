@@ -1,6 +1,6 @@
 module Day4.SolutionSpec where
 
-import Day4.Solution (BingoResult (..), bingoCount, getResult, numberOfCountToBingo, solvePart1)
+import Day4.Solution (BingoResult (..), bingoCount, getResult, numberOfCountToBingo, solvePart1, solvePart2)
 import Flow ((|>))
 import Test.Hspec (Spec, describe, it, shouldBe)
 
@@ -80,3 +80,6 @@ spec = do
 
     it "solvePart1" $ do
       solvePart1 inputText `shouldBe` Right 4512
+
+    it "solvePart2" $ do
+      solvePart2 inputText `shouldBe` Right 1924

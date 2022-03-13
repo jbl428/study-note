@@ -4,11 +4,12 @@ module Day4.Solution
     getResult,
     numberOfCountToBingo,
     solvePart1,
+    solvePart2,
   )
 where
 
 import Control.Monad (guard)
-import Data.List (elemIndex, minimumBy, transpose, (\\))
+import Data.List (elemIndex, maximumBy, minimumBy, transpose, (\\))
 import Data.List.NonEmpty (nonEmpty, toList)
 import Data.Maybe (catMaybes, mapMaybe)
 import Flow ((|>))
@@ -71,7 +72,13 @@ parsePuzzleInput = do
   return (inputs, boards)
 
 solvePart1 :: String -> Either ParseError Score
-solvePart1 content = do
+solvePart1 = solveBy minimumBy
+
+solvePart2 :: String -> Either ParseError Score
+solvePart2 = solveBy maximumBy
+
+solveBy :: (((Count, Score) -> (Count, Score) -> Ordering) -> [(Count, Score)] -> (Count, Score)) -> String -> Either ParseError Score
+solveBy compareFn content = do
   (inputs, boards) <- parse parsePuzzleInput "" content
   let (_, score) =
         boards
@@ -80,5 +87,5 @@ solvePart1 content = do
                 (Win c s) -> Just (c, s)
                 _ -> Nothing
             )
-          |> minimumBy (\a b -> compare (fst a) (fst b))
+          |> compareFn (\a b -> compare (fst a) (fst b))
   return score
