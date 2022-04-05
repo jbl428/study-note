@@ -1,6 +1,9 @@
+{-# LANGUAGE TupleSections #-}
+
 module Day5.Solution
   ( Line (..),
     parseInput,
+    getPoints,
   )
 where
 
@@ -25,3 +28,9 @@ parseInput = do
       char ','
       y2 <- numbers
       return $ Line (x1, y1) (x2, y2)
+
+getPoints :: Coordinate -> Coordinate -> [Coordinate]
+getPoints (x1, y1) (x2, y2)
+  | x1 == x2 = fmap (x1,) [(min y1 y2) .. (max y1 y2)]
+  | y1 == y2 = fmap (,y1) [(min x1 x2) .. (max x1 x2)]
+  | otherwise = []
