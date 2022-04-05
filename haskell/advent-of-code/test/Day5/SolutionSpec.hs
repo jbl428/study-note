@@ -1,6 +1,6 @@
 module Day5.SolutionSpec where
 
-import Day5.Solution (Line (Line), getPoints, parseInput, solvePart1)
+import Day5.Solution (Line (Line), getPoints, getPointsWithDiagonal, parseInput, solvePart1, solvePart2)
 import Test.Hspec (Spec, describe, it, shouldBe)
 import Text.Parsec (parse)
 
@@ -37,3 +37,18 @@ spec = do
 
     it "solvePart1" $ do
       solvePart1 examples `shouldBe` Right 5
+
+    it "getPointsWithDiagonal" $ do
+      getPointsWithDiagonal (Line (1, 2) (2, 5)) `shouldBe` []
+      getPointsWithDiagonal (Line (1, 2) (1, 2)) `shouldBe` [(1, 2)]
+      getPointsWithDiagonal (Line (1, 2) (1, 4)) `shouldBe` [(1, 2), (1, 3), (1, 4)]
+      getPointsWithDiagonal (Line (1, 4) (1, 2)) `shouldBe` [(1, 4), (1, 3), (1, 2)]
+      getPointsWithDiagonal (Line (5, 3) (3, 3)) `shouldBe` [(5, 3), (4, 3), (3, 3)]
+      getPointsWithDiagonal (Line (3, 3) (5, 3)) `shouldBe` [(3, 3), (4, 3), (5, 3)]
+      getPointsWithDiagonal (Line (2, 2) (4, 4)) `shouldBe` [(2, 2), (3, 3), (4, 4)]
+      getPointsWithDiagonal (Line (2, 4) (4, 2)) `shouldBe` [(2, 4), (3, 3), (4, 2)]
+      getPointsWithDiagonal (Line (4, 4) (2, 2)) `shouldBe` [(4, 4), (3, 3), (2, 2)]
+      getPointsWithDiagonal (Line (4, 2) (2, 4)) `shouldBe` [(4, 2), (3, 3), (2, 4)]
+
+    it "solvePart2" $ do
+      solvePart2 examples `shouldBe` Right 12
