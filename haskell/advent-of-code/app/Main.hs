@@ -4,6 +4,7 @@ import qualified Day1.Solution as D1
 import qualified Day2.Solution as D2
 import qualified Day3.Solution as D3
 import qualified Day4.Solution as D4
+import qualified Day5.Solution as D5
 
 main :: IO ()
 main = do
@@ -17,3 +18,5 @@ main = do
   content <- readFile "input/day4.txt"
   print $ D4.solvePart1 content
   print $ D4.solvePart2 content
+  content <- readFile "input/day5.txt"
+  print $ D5.solvePart1 content
