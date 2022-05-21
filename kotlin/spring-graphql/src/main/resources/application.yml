@@ -6,3 +6,4 @@ spring:
       database: test
       username: test
       password: test
+      authentication-database: admin
