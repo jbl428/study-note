@@ -20,9 +20,13 @@ internal class BookControllerTest(
         // given
         val book = Book("title", "author", "isbn").also { it.id = "1" }
         coEvery { bookService.find() } returns listOf(book)
+        val authTester = graphQlTester
+            .mutate()
+            .headers { it.setBasicAuth("admin", "admin") }
+            .build()
 
         // when
-        val response = graphQlTester
+        val response = authTester
             .documentName("books")
             .execute()
 
