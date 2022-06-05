@@ -22,7 +22,7 @@ internal class BookControllerTest(
         coEvery { bookService.find() } returns listOf(book)
         val authTester = graphQlTester
             .mutate()
-            .headers { it.setBasicAuth("admin", "admin") }
+            .headers { it.setBearerAuth("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiQURNSU4ifQ.YugxAPZbmANcCJRY1jC2sYnOhcngLeJpdH7jpEHrB_c") }
             .build()
 
         // when
