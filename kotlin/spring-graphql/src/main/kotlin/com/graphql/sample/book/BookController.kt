@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller
 class BookController(private val bookService: BookService) {
 
     @QueryMapping
-    fun hello() = "Hello World!"
+    suspend fun books() = bookService.find()
 
     @MutationMapping
     suspend fun createBook(@Argument input: CreateBookInput): Book = bookService.create(input)

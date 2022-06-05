@@ -7,6 +7,12 @@ import org.springframework.stereotype.Service
 @Service
 class BookService(private val bookRepository: BookRepository) {
 
+    suspend fun find(): List<Book> =
+        bookRepository
+            .findAll()
+            .collectList()
+            .awaitSingle()
+
     suspend fun create(input: CreateBookInput): Book =
         Book(
             title = input.title,
