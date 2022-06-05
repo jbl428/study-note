@@ -1,6 +1,12 @@
 package com.graphql.sample.book
 
-import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.annotation.Id
 
-@Document
-data class Book(val id: String, val title: String, val author: String, val isbn: String)
+data class Book(
+    val title: String,
+    val author: String,
+    val isbn: String,
+) {
+    @Id
+    lateinit var id: String
+}

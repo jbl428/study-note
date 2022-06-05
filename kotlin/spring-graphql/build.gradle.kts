@@ -18,7 +18,7 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -28,6 +28,8 @@ dependencies {
     testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.graphql:spring-graphql-test")
+    testImplementation("io.kotest:kotest-runner-junit5:5.3.0")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.1")
 }
 
 tasks.withType<KotlinCompile> {
