@@ -1,13 +1,10 @@
-package com.graphql.sample.operation
+package com.graphql.sample.aggregation
 
 import org.bson.Document
 import org.springframework.data.mapping.toDotPath
 import kotlin.reflect.KProperty
 
-@DslMarker
-annotation class SearchDsl
-
-@SearchDsl
+@AggregationDsl
 class SearchOperationBuilder {
     private val document = Document()
 
@@ -24,7 +21,7 @@ class SearchOperationBuilder {
     fun build(): SearchOperation = SearchOperation(document)
 }
 
-@SearchDsl
+@AggregationDsl
 class SearchTextBuilder {
     private var query: List<String> = emptyList()
     private var path: List<String> = emptyList()
@@ -45,7 +42,7 @@ class SearchTextBuilder {
     }
 }
 
-@SearchDsl
+@AggregationDsl
 class SearchTextPathBuilder {
     private var path: MutableList<String> = mutableListOf()
 

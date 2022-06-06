@@ -1,4 +1,4 @@
-package com.graphql.sample.operation
+package com.graphql.sample.aggregation
 
 import org.bson.Document
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation
@@ -8,12 +8,9 @@ class SearchOperation(
     private val document: Document
 ) : AggregationOperation {
 
+    @Deprecated("Deprecated in Java")
     override fun toDocument(context: AggregationOperationContext): Document =
         Document(operator, document)
 
     override fun getOperator(): String = "\$search"
-}
-
-fun search(block: SearchOperationBuilder.() -> Unit): SearchOperation {
-    return SearchOperationBuilder().apply(block).build()
 }
