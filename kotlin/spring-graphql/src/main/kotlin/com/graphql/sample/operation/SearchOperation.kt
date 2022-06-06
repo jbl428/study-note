@@ -1,4 +1,4 @@
-package com.graphql.sample.search
+package com.graphql.sample.operation
 
 import org.bson.Document
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation

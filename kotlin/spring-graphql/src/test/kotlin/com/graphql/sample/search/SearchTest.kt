@@ -3,6 +3,8 @@ package com.graphql.sample.search
 import com.graphql.sample.book.Book
 import com.graphql.sample.book.Info
 import com.graphql.sample.book.Publisher
+import com.graphql.sample.operation.SearchOperation
+import com.graphql.sample.operation.search
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
