@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("org.springframework.boot") version "2.7.0"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
-
-    kotlin("jvm") version "1.6.21"
-    kotlin("plugin.spring") version "1.6.21"
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
 }
 
 group = "com.graphql"
@@ -18,28 +18,23 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
-    implementation("org.springframework.boot:spring-boot-starter-graphql")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("io.arrow-kt:arrow-core:1.1.2")
-    implementation("io.github.nefilim.kjwt:kjwt-core:0.5.3")
-    testImplementation("io.mockk:mockk:1.12.4")
-    testImplementation("com.ninja-squad:springmockk:3.1.1")
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+    implementation(libs.spring.data.mongodb.reactive)
+    implementation(libs.spring.graphql)
+    implementation(libs.spring.webflux)
+    implementation(libs.spring.security)
+    implementation(libs.bundles.kotlin.libs)
+    implementation(libs.arrow.core)
+    implementation(libs.kjwt.core)
+    implementation(libs.mockk)
+    implementation(libs.spring.mockk)
+    testImplementation(libs.spring.starter.test) {
         exclude(module = "mockito-core")
     }
-    testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
-    testImplementation("io.projectreactor:reactor-test")
-    testImplementation("org.springframework.graphql:spring-graphql-test")
-    testImplementation("io.kotest:kotest-runner-junit5:5.3.0")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.1")
+    testImplementation(libs.spring.security.test)
+    testImplementation(libs.spring.graphql.test)
+    testImplementation(libs.embed.mongo)
+    testImplementation(libs.reactore.test)
+    testImplementation(libs.bundles.kotest)
 }
 
 tasks.withType<KotlinCompile> {
