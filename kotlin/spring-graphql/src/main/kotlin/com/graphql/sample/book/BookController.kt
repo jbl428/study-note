@@ -12,7 +12,7 @@ class BookController(private val bookService: BookService) {
 
     @QueryMapping
     @PreAuthorize("hasRole('ADMIN')")
-    suspend fun books() = bookService.find()
+    suspend fun books(): List<Book> = bookService.find()
 
     @MutationMapping
     suspend fun createBook(@Argument input: CreateBookInput): Book = bookService.create(input)
