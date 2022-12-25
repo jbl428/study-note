@@ -2,6 +2,8 @@ import "fp-ts/lib/HKT";
 
 type Probability = number;
 
+type Event<CASE> = (a: CASE) => boolean;
+
 export class Distributions<CASE> {
   readonly #value: [CASE, Probability][];
 
@@ -27,8 +29,20 @@ export class Distributions<CASE> {
     return new Distributions(normalized);
   }
 
+  static uniform<CASE>(cases: CASE[]): Distributions<CASE> {
+    const prob = 1 / cases.length;
+
+    return new Distributions(cases.map((c) => [c, prob]));
+  }
+
   get value(): [CASE, Probability][] {
     return this.#value;
+  }
+
+  evaluate(event: Event<CASE>): Probability {
+    return this.#value.reduce((acc, [c, prob]) => {
+      return event(c) ? acc + prob : acc;
+    }, 0);
   }
 }
 

@@ -42,4 +42,24 @@ describe("Distributions", () => {
       [3, 0.4],
     ]);
   });
+
+  it("동일한 확률을 가진 인스턴스를 생성한다", () => {
+    const dist = Distributions.uniform([1, 2, 3, 4]);
+
+    assert.deepStrictEqual(dist.value, [
+      [1, 0.25],
+      [2, 0.25],
+      [3, 0.25],
+      [4, 0.25],
+    ]);
+  });
+
+  it("주사위의 값이 짝수가 될 확률을 계산한다", () => {
+    const dist = Distributions.uniform([1, 2, 3, 4, 5, 6]);
+
+    assert.strictEqual(
+      dist.evaluate((n) => n % 2 === 0),
+      0.5
+    );
+  });
 });
