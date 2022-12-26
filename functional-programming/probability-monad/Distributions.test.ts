@@ -1,5 +1,5 @@
 import { describe, it } from "node:test";
-import assert from "node:assert/strict";
+import { deepStrictEqual } from "node:assert/strict";
 import { ap, Distributions, map } from "./Distributions";
 import { pipe } from "fp-ts/function";
 
@@ -10,7 +10,7 @@ describe("Distributions", () => {
       [2, 0.5],
     ]);
 
-    assert.deepStrictEqual(dist.value, [
+    deepStrictEqual(dist.value, [
       [1, 0.5],
       [2, 0.5],
     ]);
@@ -24,7 +24,7 @@ describe("Distributions", () => {
       [1, 0.4],
     ]);
 
-    assert.deepStrictEqual(dist.value, [
+    deepStrictEqual(dist.value, [
       [1, 0.5],
       [2, 0.5],
     ]);
@@ -37,7 +37,7 @@ describe("Distributions", () => {
       [3, 40],
     ]);
 
-    assert.deepStrictEqual(dist.value, [
+    deepStrictEqual(dist.value, [
       [1, 0.2],
       [2, 0.4],
       [3, 0.4],
@@ -47,7 +47,7 @@ describe("Distributions", () => {
   it("동일한 확률을 가진 인스턴스를 생성한다", () => {
     const dist = Distributions.uniform([1, 2, 3, 4]);
 
-    assert.deepStrictEqual(dist.value, [
+    deepStrictEqual(dist.value, [
       [1, 0.25],
       [2, 0.25],
       [3, 0.25],
@@ -58,7 +58,7 @@ describe("Distributions", () => {
   it("주사위의 값이 짝수가 될 확률을 계산한다", () => {
     const dist = Distributions.uniform([1, 2, 3, 4, 5, 6]);
 
-    assert.strictEqual(
+    deepStrictEqual(
       dist.evaluate((n) => n % 2 === 0),
       0.5
     );
@@ -78,7 +78,7 @@ describe("Distributions", () => {
       map(([_, y]) => y)
     );
 
-    assert.deepStrictEqual(result.value, [
+    deepStrictEqual(result.value, [
       [0, 0.1 + 0.2],
       [1, 0.4 + 0.3],
     ]);
@@ -91,7 +91,7 @@ describe("Distributions", () => {
 
     const result = pipe(dist1, map(join), ap(dist2));
 
-    assert.deepStrictEqual(result.value, [
+    deepStrictEqual(result.value, [
       ["(1, 1)", 0.125],
       ["(1, 2)", 0.125],
       ["(1, 3)", 0.125],
