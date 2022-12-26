@@ -184,4 +184,33 @@ describe("Distributions", () => {
 
     deepStrictEqual(result.toFixed(1), "0.3");
   });
+
+  it("베이즈 정리 문제풀이", () => {
+    const hasDisease = Distributions.of([
+      [true, 0.01],
+      [false, 0.99],
+    ]);
+    const truePositive = Distributions.of([
+      [true, 0.95],
+      [false, 0.05],
+    ]);
+    const falsePositive = Distributions.of([
+      [true, 0.05],
+      [false, 0.95],
+    ]);
+
+    const result = pipe(
+      hasDisease,
+      chain((hasDisease) =>
+        pipe(
+          hasDisease ? truePositive : falsePositive,
+          map((testPositive) => [hasDisease, testPositive] as const)
+        )
+      ),
+      (dist) => dist.condition(([_, testPositive]) => testPositive),
+      (dist) => dist.evaluate(([hasDisease]) => hasDisease)
+    );
+
+    deepStrictEqual(result.toFixed(2), "0.16");
+  });
 });
