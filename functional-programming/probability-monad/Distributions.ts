@@ -85,3 +85,16 @@ export const liftA2 =
       map((a) => (b: B) => f(a, b)),
       ap(fb)
     );
+
+export const chain =
+  <A, B>(f: (a: A) => Distributions<B>) =>
+  (fa: Distributions<A>): Distributions<B> =>
+    Distributions.of(
+      fa.value.flatMap(
+        ([c, prob1]) =>
+          f(c).value.map(([b, prob2]) => [b, prob1 * prob2]) as [
+            B,
+            Probability
+          ][]
+      )
+    );

@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { deepStrictEqual } from "node:assert/strict";
-import { ap, Distributions, liftA2, map } from "./Distributions";
+import { ap, chain, Distributions, liftA2, map } from "./Distributions";
 import { pipe } from "fp-ts/function";
 
 describe("Distributions", () => {
@@ -130,5 +130,43 @@ describe("Distributions", () => {
         [10, 0.00001],
       ]
     );
+  });
+
+  it("chain을 활용해 의존확률분포를 구한다", () => {
+    enum Dice {
+      One = 1,
+      Two,
+      Three,
+      Four,
+      Five,
+      Six,
+    }
+    const dics = Distributions.uniform<Dice>([
+      Dice.One,
+      Dice.Two,
+      Dice.Three,
+      Dice.Four,
+      Dice.Five,
+      Dice.Six,
+    ]);
+    enum Coin {
+      Head = "Head",
+      Tail = "Tail",
+    }
+    const fairCoin = Distributions.uniform([Coin.Head, Coin.Tail]);
+    const unfairCoin = Distributions.of([
+      [Coin.Head, 0.1],
+      [Coin.Tail, 0.9],
+    ]);
+
+    const result = pipe(
+      dics,
+      chain((n) => (n === Dice.Six ? fairCoin : unfairCoin))
+    );
+
+    deepStrictEqual(result.value, [
+      [Coin.Head, 1 / 6],
+      [Coin.Tail, 5 / 6],
+    ]);
   });
 });
