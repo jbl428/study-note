@@ -17,7 +17,7 @@ enum Coin {
   Tail = "Tail",
 }
 
-const dics = Distributions.uniform<Dice>([
+const dice = Distributions.uniform([
   Dice.One,
   Dice.Two,
   Dice.Three,
@@ -163,7 +163,7 @@ describe("Distributions", () => {
     ]);
 
     const result = pipe(
-      dics,
+      dice,
       chain((n) => (n === Dice.Six ? coin : unfairCoin))
     );
 
@@ -175,7 +175,7 @@ describe("Distributions", () => {
 
   it("조건부 확률을 구한다", () => {
     const join = liftA2((a: Dice, b: Dice) => [a, b] as const);
-    const twoDice = join(dics, dics);
+    const twoDice = join(dice, dice);
     const condition = twoDice.condition(
       ([first, second]) => first + second <= 5
     );
