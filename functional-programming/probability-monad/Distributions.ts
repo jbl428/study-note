@@ -1,4 +1,5 @@
 import "fp-ts/lib/HKT";
+import { pipe } from "fp-ts/function";
 
 type Probability = number;
 
@@ -18,10 +19,7 @@ export class Distributions<CASE> {
       return acc;
     }, new Map<CASE, Probability>());
 
-    const sum = Array.from(grouped.values()).reduce(
-      (acc, prob) => acc + prob,
-      0
-    );
+    const sum = Array.from(grouped.values()).reduce((acc, prob) => acc + prob);
     const normalized = Array.from(grouped.entries()).map(
       ([c, prob]) => [c, prob / sum] as [CASE, Probability]
     );
@@ -77,4 +75,13 @@ export const ap =
             Probability
           ][]
       )
+    );
+
+export const liftA2 =
+  <A, B, C>(f: (a: A, b: B) => C) =>
+  (fa: Distributions<A>, fb: Distributions<B>): Distributions<C> =>
+    pipe(
+      fa,
+      map((a) => (b: B) => f(a, b)),
+      ap(fb)
     );

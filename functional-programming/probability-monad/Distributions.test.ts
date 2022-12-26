@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { deepStrictEqual } from "node:assert/strict";
-import { ap, Distributions, map } from "./Distributions";
+import { ap, Distributions, liftA2, map } from "./Distributions";
 import { pipe } from "fp-ts/function";
 
 describe("Distributions", () => {
@@ -101,5 +101,34 @@ describe("Distributions", () => {
       ["(2, 3)", 0.125],
       ["(2, 4)", 0.125],
     ]);
+  });
+
+  it("독립시행횟수 10, 성공확률이 0.3인 이항분포를 구한다", () => {
+    const sum = (a: number, b: number) => a + b;
+    const dists = Array.from({ length: 10 }, () =>
+      Distributions.of([
+        [0, 0.7],
+        [1, 0.3],
+      ])
+    );
+
+    const result = dists.reduce(liftA2(sum));
+
+    deepStrictEqual(
+      result.value.map(([a, b]) => [a, +b.toFixed(5)]),
+      [
+        [0, 0.02825],
+        [1, 0.12106],
+        [2, 0.23347],
+        [3, 0.26683],
+        [4, 0.20012],
+        [5, 0.10292],
+        [6, 0.03676],
+        [7, 0.009],
+        [8, 0.00145],
+        [9, 0.00014],
+        [10, 0.00001],
+      ]
+    );
   });
 });
