@@ -1,6 +1,14 @@
 import { describe, it } from "node:test";
 import { deepStrictEqual } from "node:assert/strict";
-import { ap, chain, Distributions, liftA2, map } from "./Distributions";
+import {
+  ap,
+  chain,
+  condition,
+  Distributions,
+  evaluate,
+  liftA2,
+  map,
+} from "./Distributions";
 import { pipe } from "fp-ts/function";
 
 enum Dice {
@@ -176,39 +184,40 @@ describe("Distributions", () => {
   it("조건부 확률을 구한다", () => {
     const join = liftA2((a: Dice, b: Dice) => [a, b] as const);
     const twoDice = join(dice, dice);
-    const condition = twoDice.condition(
-      ([first, second]) => first + second <= 5
-    );
 
-    const result = condition.evaluate(([first]) => first === Dice.Two);
+    const result = pipe(
+      twoDice,
+      condition(([first, second]) => first + second <= 5),
+      evaluate(([first]) => first === Dice.Two)
+    );
 
     deepStrictEqual(result.toFixed(1), "0.3");
   });
 
   it("베이즈 정리 문제풀이", () => {
-    const hasDisease = Distributions.of([
+    const diseaseDist = Distributions.of([
       [true, 0.01],
       [false, 0.99],
     ]);
-    const truePositive = Distributions.of([
+    const positiveTest = Distributions.of([
       [true, 0.95],
       [false, 0.05],
     ]);
-    const falsePositive = Distributions.of([
+    const negativeTest = Distributions.of([
       [true, 0.05],
       [false, 0.95],
     ]);
 
     const result = pipe(
-      hasDisease,
-      chain((hasDisease) =>
+      diseaseDist,
+      chain((disease) =>
         pipe(
-          hasDisease ? truePositive : falsePositive,
-          map((testPositive) => [hasDisease, testPositive] as const)
+          disease ? positiveTest : negativeTest,
+          map((test) => [disease, test] as const)
         )
       ),
-      (dist) => dist.condition(([_, testPositive]) => testPositive),
-      (dist) => dist.evaluate(([hasDisease]) => hasDisease)
+      condition(([_, test]) => test),
+      evaluate(([disease]) => disease)
     );
 
     deepStrictEqual(result.toFixed(2), "0.16");

@@ -63,6 +63,16 @@ declare module "fp-ts/lib/HKT" {
   }
 }
 
+export const evaluate =
+  <CASE>(event: Event<CASE>) =>
+  (dist: Distributions<CASE>): Probability =>
+    dist.evaluate(event);
+
+export const condition =
+  <CASE>(event: Event<CASE>) =>
+  (dist: Distributions<CASE>): Distributions<CASE> =>
+    dist.condition(event);
+
 export const map =
   <A, B>(f: (a: A) => B) =>
   (fa: Distributions<A>): Distributions<B> =>
