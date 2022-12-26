@@ -47,6 +47,10 @@ export class Distributions<CASE> {
       0
     );
   }
+
+  condition(event: Event<CASE>): Distributions<CASE> {
+    return Distributions.of(this.#value.filter(([c, _]) => event(c)));
+  }
 }
 
 export const URI = "Distributions";

@@ -3,6 +3,31 @@ import { deepStrictEqual } from "node:assert/strict";
 import { ap, chain, Distributions, liftA2, map } from "./Distributions";
 import { pipe } from "fp-ts/function";
 
+enum Dice {
+  One = 1,
+  Two,
+  Three,
+  Four,
+  Five,
+  Six,
+}
+
+enum Coin {
+  Head = "Head",
+  Tail = "Tail",
+}
+
+const dics = Distributions.uniform<Dice>([
+  Dice.One,
+  Dice.Two,
+  Dice.Three,
+  Dice.Four,
+  Dice.Five,
+  Dice.Six,
+]);
+
+const coin = Distributions.uniform([Coin.Head, Coin.Tail]);
+
 describe("Distributions", () => {
   it("distributions 객체를 생성한다", () => {
     const dist = Distributions.of([
@@ -131,29 +156,7 @@ describe("Distributions", () => {
       ]
     );
   });
-
   it("chain을 활용해 의존확률분포를 구한다", () => {
-    enum Dice {
-      One = 1,
-      Two,
-      Three,
-      Four,
-      Five,
-      Six,
-    }
-    const dics = Distributions.uniform<Dice>([
-      Dice.One,
-      Dice.Two,
-      Dice.Three,
-      Dice.Four,
-      Dice.Five,
-      Dice.Six,
-    ]);
-    enum Coin {
-      Head = "Head",
-      Tail = "Tail",
-    }
-    const fairCoin = Distributions.uniform([Coin.Head, Coin.Tail]);
     const unfairCoin = Distributions.of([
       [Coin.Head, 0.1],
       [Coin.Tail, 0.9],
@@ -161,12 +164,24 @@ describe("Distributions", () => {
 
     const result = pipe(
       dics,
-      chain((n) => (n === Dice.Six ? fairCoin : unfairCoin))
+      chain((n) => (n === Dice.Six ? coin : unfairCoin))
     );
 
     deepStrictEqual(result.value, [
       [Coin.Head, 1 / 6],
       [Coin.Tail, 5 / 6],
     ]);
+  });
+
+  it("조건부 확률을 구한다", () => {
+    const join = liftA2((a: Dice, b: Dice) => [a, b] as const);
+    const twoDice = join(dics, dics);
+    const condition = twoDice.condition(
+      ([first, second]) => first + second <= 5
+    );
+
+    const result = condition.evaluate(([first]) => first === Dice.Two);
+
+    deepStrictEqual(result.toFixed(1), "0.3");
   });
 });
