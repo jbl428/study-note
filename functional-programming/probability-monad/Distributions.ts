@@ -35,8 +35,12 @@ export class Distributions<CASE> {
     return new Distributions(cases.map((c) => [c, prob]));
   }
 
+  static pure<CASE>(c: CASE): Distributions<CASE> {
+    return new Distributions([[c, 1]]);
+  }
+
   get value(): [CASE, Probability][] {
-    return this.#value;
+    return this.#value.map(([c, prob]) => [c, prob]);
   }
 
   evaluate(event: Event<CASE>): Probability {
@@ -58,6 +62,19 @@ declare module "fp-ts/lib/HKT" {
 }
 
 export const map =
-  <CASE, B>(f: (a: CASE) => B) =>
-  (fa: Distributions<CASE>): Distributions<B> =>
+  <A, B>(f: (a: A) => B) =>
+  (fa: Distributions<A>): Distributions<B> =>
     Distributions.of(fa.value.map(([c, prob]) => [f(c), prob]));
+
+export const ap =
+  <A, B>(fa: Distributions<A>) =>
+  (fab: Distributions<(a: A) => B>): Distributions<B> =>
+    Distributions.of(
+      fab.value.flatMap(
+        ([f, prob1]) =>
+          fa.value.map(([b, prob2]) => [f(b), prob1 * prob2]) as [
+            B,
+            Probability
+          ][]
+      )
+    );

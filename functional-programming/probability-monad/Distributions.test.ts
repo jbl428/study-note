@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { Distributions, map } from "./Distributions";
+import { ap, Distributions, map } from "./Distributions";
 import { pipe } from "fp-ts/function";
 
 describe("Distributions", () => {
@@ -81,6 +81,25 @@ describe("Distributions", () => {
     assert.deepStrictEqual(result.value, [
       [0, 0.1 + 0.2],
       [1, 0.4 + 0.3],
+    ]);
+  });
+
+  it("ap를 통해 결합분포를 구한다", () => {
+    const join = (a: number) => (b: number) => `(${a}, ${b})`;
+    const dist1 = Distributions.uniform([1, 2]);
+    const dist2 = Distributions.uniform([1, 2, 3, 4]);
+
+    const result = pipe(dist1, map(join), ap(dist2));
+
+    assert.deepStrictEqual(result.value, [
+      ["(1, 1)", 0.125],
+      ["(1, 2)", 0.125],
+      ["(1, 3)", 0.125],
+      ["(1, 4)", 0.125],
+      ["(2, 1)", 0.125],
+      ["(2, 2)", 0.125],
+      ["(2, 3)", 0.125],
+      ["(2, 4)", 0.125],
     ]);
   });
 });
