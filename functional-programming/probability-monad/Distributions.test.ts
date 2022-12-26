@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { Distributions } from "./Distributions";
+import { Distributions, map } from "./Distributions";
+import { pipe } from "fp-ts/function";
 
 describe("Distributions", () => {
   it("distributions 객체를 생성한다", () => {
@@ -61,5 +62,25 @@ describe("Distributions", () => {
       dist.evaluate((n) => n % 2 === 0),
       0.5
     );
+  });
+
+  it("map을 통해 주변분포를 구한다", () => {
+    type Tuple = [number, number];
+    const dist = Distributions.of<Tuple>([
+      [[0, 0], 0.2],
+      [[0, 1], 0.4],
+      [[1, 0], 0.1],
+      [[1, 1], 0.3],
+    ]);
+
+    const result = pipe(
+      dist,
+      map(([_, y]) => y)
+    );
+
+    assert.deepStrictEqual(result.value, [
+      [0, 0.1 + 0.2],
+      [1, 0.4 + 0.3],
+    ]);
   });
 });

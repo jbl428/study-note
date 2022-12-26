@@ -7,7 +7,7 @@ type Event<CASE> = (a: CASE) => boolean;
 export class Distributions<CASE> {
   readonly #value: [CASE, Probability][];
 
-  constructor(value: [CASE, Probability][]) {
+  private constructor(value: [CASE, Probability][]) {
     this.#value = value;
   }
 
@@ -40,9 +40,10 @@ export class Distributions<CASE> {
   }
 
   evaluate(event: Event<CASE>): Probability {
-    return this.#value.reduce((acc, [c, prob]) => {
-      return event(c) ? acc + prob : acc;
-    }, 0);
+    return this.#value.reduce(
+      (acc, [c, prob]) => (event(c) ? acc + prob : acc),
+      0
+    );
   }
 }
 
@@ -55,3 +56,8 @@ declare module "fp-ts/lib/HKT" {
     readonly [URI]: Distributions<A>;
   }
 }
+
+export const map =
+  <CASE, B>(f: (a: CASE) => B) =>
+  (fa: Distributions<CASE>): Distributions<B> =>
+    Distributions.of(fa.value.map(([c, prob]) => [f(c), prob]));
