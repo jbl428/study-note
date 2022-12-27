@@ -3,52 +3,52 @@ import { pipe } from "fp-ts/function";
 
 type Probability = number;
 
-type Event<CASE> = (a: CASE) => boolean;
+type Event<RANDOM_VARIABLE> = (a: RANDOM_VARIABLE) => boolean;
 
-export class Distributions<CASE> {
-  readonly #value: [CASE, Probability][];
+export class Distributions<RANDOM_VARIABLE> {
+  readonly #value: [RANDOM_VARIABLE, Probability][];
 
-  private constructor(value: [CASE, Probability][]) {
+  private constructor(value: [RANDOM_VARIABLE, Probability][]) {
     this.#value = value;
   }
 
-  static of<CASE>(value: [CASE, Probability][]): Distributions<CASE> {
+  static of<RANDOM_VARIABLE>(value: [RANDOM_VARIABLE, Probability][]): Distributions<RANDOM_VARIABLE> {
     const grouped = value.reduce((acc, [c, prob]) => {
       acc.set(c, (acc.get(c) ?? 0) + prob);
 
       return acc;
-    }, new Map<CASE, Probability>());
+    }, new Map<RANDOM_VARIABLE, Probability>());
 
     const sum = Array.from(grouped.values()).reduce((acc, prob) => acc + prob);
     const normalized = Array.from(grouped.entries()).map(
-      ([c, prob]) => [c, prob / sum] as [CASE, Probability]
+      ([c, prob]) => [c, prob / sum] as [RANDOM_VARIABLE, Probability]
     );
 
     return new Distributions(normalized);
   }
 
-  static uniform<CASE>(cases: CASE[]): Distributions<CASE> {
-    const prob = 1 / cases.length;
+  static uniform<RANDOM_VARIABLE>(variables: RANDOM_VARIABLE[]): Distributions<RANDOM_VARIABLE> {
+    const prob = 1 / variables.length;
 
-    return new Distributions(cases.map((c) => [c, prob]));
+    return new Distributions(variables.map((c) => [c, prob]));
   }
 
-  static pure<CASE>(c: CASE): Distributions<CASE> {
+  static pure<RANDOM_VARIABLE>(c: RANDOM_VARIABLE): Distributions<RANDOM_VARIABLE> {
     return new Distributions([[c, 1]]);
   }
 
-  get value(): [CASE, Probability][] {
+  get value(): [RANDOM_VARIABLE, Probability][] {
     return this.#value.map(([c, prob]) => [c, prob]);
   }
 
-  evaluate(event: Event<CASE>): Probability {
+  evaluate(event: Event<RANDOM_VARIABLE>): Probability {
     return this.#value.reduce(
       (acc, [c, prob]) => (event(c) ? acc + prob : acc),
       0
     );
   }
 
-  condition(event: Event<CASE>): Distributions<CASE> {
+  condition(event: Event<RANDOM_VARIABLE>): Distributions<RANDOM_VARIABLE> {
     return Distributions.of(this.#value.filter(([c, _]) => event(c)));
   }
 }
@@ -64,13 +64,13 @@ declare module "fp-ts/lib/HKT" {
 }
 
 export const evaluate =
-  <CASE>(event: Event<CASE>) =>
-  (dist: Distributions<CASE>): Probability =>
+  <RANDOM_VARIABLE>(event: Event<RANDOM_VARIABLE>) =>
+  (dist: Distributions<RANDOM_VARIABLE>): Probability =>
     dist.evaluate(event);
 
 export const condition =
-  <CASE>(event: Event<CASE>) =>
-  (dist: Distributions<CASE>): Distributions<CASE> =>
+  <RANDOM_VARIABLE>(event: Event<RANDOM_VARIABLE>) =>
+  (dist: Distributions<RANDOM_VARIABLE>): Distributions<RANDOM_VARIABLE> =>
     dist.condition(event);
 
 export const map =

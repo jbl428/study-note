@@ -49,7 +49,7 @@ describe("Distributions", () => {
     ]);
   });
 
-  it("같은 case를 가진 항목끼리 합산해 하나로 만든다", () => {
+  it("같은 확률변수를 가진 항목끼리 합산해 하나로 만든다", () => {
     const dist = Distributions.of([
       [1, 0.1],
       [2, 0.3],
