@@ -12,7 +12,9 @@ export class Distributions<RANDOM_VARIABLE> {
     this.#value = value;
   }
 
-  static of<RANDOM_VARIABLE>(value: [RANDOM_VARIABLE, Probability][]): Distributions<RANDOM_VARIABLE> {
+  static of<RANDOM_VARIABLE>(
+    value: [RANDOM_VARIABLE, Probability][]
+  ): Distributions<RANDOM_VARIABLE> {
     const grouped = value.reduce((acc, [c, prob]) => {
       acc.set(c, (acc.get(c) ?? 0) + prob);
 
@@ -27,13 +29,17 @@ export class Distributions<RANDOM_VARIABLE> {
     return new Distributions(normalized);
   }
 
-  static uniform<RANDOM_VARIABLE>(variables: RANDOM_VARIABLE[]): Distributions<RANDOM_VARIABLE> {
+  static uniform<RANDOM_VARIABLE>(
+    variables: RANDOM_VARIABLE[]
+  ): Distributions<RANDOM_VARIABLE> {
     const prob = 1 / variables.length;
 
     return new Distributions(variables.map((c) => [c, prob]));
   }
 
-  static pure<RANDOM_VARIABLE>(c: RANDOM_VARIABLE): Distributions<RANDOM_VARIABLE> {
+  static pure<RANDOM_VARIABLE>(
+    c: RANDOM_VARIABLE
+  ): Distributions<RANDOM_VARIABLE> {
     return new Distributions([[c, 1]]);
   }
 
