@@ -164,6 +164,7 @@ describe("Distributions", () => {
       ]
     );
   });
+
   it("chain을 활용해 의존확률분포를 구한다", () => {
     const unfairCoin = Distributions.of([
       [Coin.Head, 0.1],
