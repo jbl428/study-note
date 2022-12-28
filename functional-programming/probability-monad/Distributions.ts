@@ -15,15 +15,16 @@ export class Distributions<RANDOM_VARIABLE> {
   static of<RANDOM_VARIABLE>(
     value: [RANDOM_VARIABLE, Probability][]
   ): Distributions<RANDOM_VARIABLE> {
-    const grouped = value.reduce((acc, [c, prob]) => {
-      acc.set(c, (acc.get(c) ?? 0) + prob);
+    const grouped = value.reduce((acc, [variable, prob]) => {
+      acc.set(variable, (acc.get(variable) ?? 0) + prob);
 
       return acc;
     }, new Map<RANDOM_VARIABLE, Probability>());
 
     const sum = Array.from(grouped.values()).reduce((acc, prob) => acc + prob);
     const normalized = Array.from(grouped.entries()).map(
-      ([c, prob]) => [c, prob / sum] as [RANDOM_VARIABLE, Probability]
+      ([variable, prob]) =>
+        [variable, prob / sum] as [RANDOM_VARIABLE, Probability]
     );
 
     return new Distributions(normalized);
@@ -34,28 +35,30 @@ export class Distributions<RANDOM_VARIABLE> {
   ): Distributions<RANDOM_VARIABLE> {
     const prob = 1 / variables.length;
 
-    return new Distributions(variables.map((c) => [c, prob]));
+    return new Distributions(variables.map((variable) => [variable, prob]));
   }
 
   static pure<RANDOM_VARIABLE>(
-    c: RANDOM_VARIABLE
+    variable: RANDOM_VARIABLE
   ): Distributions<RANDOM_VARIABLE> {
-    return new Distributions([[c, 1]]);
+    return new Distributions([[variable, 1]]);
   }
 
   get value(): [RANDOM_VARIABLE, Probability][] {
-    return this.#value.map(([c, prob]) => [c, prob]);
+    return this.#value.map(([variable, prob]) => [variable, prob]);
   }
 
   evaluate(event: Event<RANDOM_VARIABLE>): Probability {
     return this.#value.reduce(
-      (acc, [c, prob]) => (event(c) ? acc + prob : acc),
+      (acc, [variable, prob]) => (event(variable) ? acc + prob : acc),
       0
     );
   }
 
   condition(event: Event<RANDOM_VARIABLE>): Distributions<RANDOM_VARIABLE> {
-    return Distributions.of(this.#value.filter(([c, _]) => event(c)));
+    return Distributions.of(
+      this.#value.filter(([variable, _]) => event(variable))
+    );
   }
 }
 
@@ -82,7 +85,7 @@ export const condition =
 export const map =
   <A, B>(f: (a: A) => B) =>
   (fa: Distributions<A>): Distributions<B> =>
-    Distributions.of(fa.value.map(([c, prob]) => [f(c), prob]));
+    Distributions.of(fa.value.map(([variable, prob]) => [f(variable), prob]));
 
 export const ap =
   <A, B>(fa: Distributions<A>) =>
@@ -111,8 +114,8 @@ export const chain =
   (fa: Distributions<A>): Distributions<B> =>
     Distributions.of(
       fa.value.flatMap(
-        ([c, prob1]) =>
-          f(c).value.map(([b, prob2]) => [b, prob1 * prob2]) as [
+        ([variable, prob1]) =>
+          f(variable).value.map(([b, prob2]) => [b, prob1 * prob2]) as [
             B,
             Probability
           ][]
