@@ -55,7 +55,7 @@ export class Distributions<RANDOM_VARIABLE> {
     );
   }
 
-  condition(event: Event<RANDOM_VARIABLE>): Distributions<RANDOM_VARIABLE> {
+  conditional(event: Event<RANDOM_VARIABLE>): Distributions<RANDOM_VARIABLE> {
     return Distributions.of(
       this.#value.filter(([variable, _]) => event(variable))
     );
@@ -77,10 +77,10 @@ export const evaluate =
   (dist: Distributions<RANDOM_VARIABLE>): Probability =>
     dist.evaluate(event);
 
-export const condition =
+export const conditional =
   <RANDOM_VARIABLE>(event: Event<RANDOM_VARIABLE>) =>
   (dist: Distributions<RANDOM_VARIABLE>): Distributions<RANDOM_VARIABLE> =>
-    dist.condition(event);
+    dist.conditional(event);
 
 export const map =
   <A, B>(f: (a: A) => B) =>
@@ -93,7 +93,7 @@ export const ap =
     Distributions.of(
       fab.value.flatMap(
         ([f, prob1]) =>
-          fa.value.map(([b, prob2]) => [f(b), prob1 * prob2]) as [
+          fa.value.map(([a, prob2]) => [f(a), prob1 * prob2]) as [
             B,
             Probability
           ][]

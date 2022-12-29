@@ -3,7 +3,7 @@ import { deepStrictEqual } from "node:assert/strict";
 import {
   ap,
   chain,
-  condition,
+  conditional,
   Distributions,
   evaluate,
   liftA2,
@@ -89,30 +89,36 @@ describe("Distributions", () => {
   });
 
   it("주사위의 값이 짝수가 될 확률을 계산한다", () => {
-    const dist = Distributions.uniform([1, 2, 3, 4, 5, 6]);
-
     deepStrictEqual(
-      dist.evaluate((n) => n % 2 === 0),
+      dice.evaluate((n) => n % 2 === 0),
       0.5
     );
   });
 
   it("map을 통해 주변분포를 구한다", () => {
-    type Tuple = [number, number];
-    const dist = Distributions.of<Tuple>([
+    type JoinVariable = [X: number, Y: number];
+    const dist = Distributions.of<JoinVariable>([
       [[0, 0], 0.2],
       [[0, 1], 0.4],
       [[1, 0], 0.1],
       [[1, 1], 0.3],
     ]);
 
-    const result = pipe(
+    const marginalX = pipe(
+      dist,
+      map(([x, _]) => x)
+    );
+    const marginalY = pipe(
       dist,
       map(([_, y]) => y)
     );
 
-    deepStrictEqual(result.value, [
-      [0, 0.1 + 0.2],
+    deepStrictEqual(marginalX.value, [
+      [0, 0.2 + 0.4],
+      [1, 0.1 + 0.3],
+    ]);
+    deepStrictEqual(marginalY.value, [
+      [0, 0.2 + 0.1],
       [1, 0.4 + 0.3],
     ]);
   });
@@ -186,9 +192,13 @@ describe("Distributions", () => {
     const join = liftA2((a: Dice, b: Dice) => [a, b] as const);
     const twoDice = join(dice, dice);
 
+    twoDice
+      .conditional(([first, second]) => first + second <= 5)
+      .evaluate(([first]) => first === Dice.Two);
+
     const result = pipe(
       twoDice,
-      condition(([first, second]) => first + second <= 5),
+      conditional(([first, second]) => first + second <= 5),
       evaluate(([first]) => first === Dice.Two)
     );
 
@@ -217,7 +227,7 @@ describe("Distributions", () => {
           map((test) => [disease, test] as const)
         )
       ),
-      condition(([_, test]) => test),
+      conditional(([_, test]) => test),
       evaluate(([disease]) => disease)
     );
 
