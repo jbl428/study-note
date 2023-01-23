@@ -1,13 +1,15 @@
 package com.example.jdbc.service
 
 import com.example.jdbc.repository.PostRepository
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
+import org.springframework.data.repository.findByIdOrNull
 
 @DataJdbcTest
 class PostServiceTest @Autowired constructor(
-    postRepository: PostRepository
+    private val postRepository: PostRepository
 ) {
     private val postService = PostService(postRepository)
 
@@ -17,6 +19,7 @@ class PostServiceTest @Autowired constructor(
         val post = postService.create()
 
         // then
-        println(post)
+        val result = postRepository.findByIdOrNull(post.id)
+        result shouldBe post
     }
 }

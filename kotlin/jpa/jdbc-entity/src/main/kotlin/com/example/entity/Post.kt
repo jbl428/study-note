@@ -3,12 +3,12 @@ package com.example.entity
 import org.springframework.data.relational.core.mapping.Table
 
 @Table
-data class Post private constructor(
+data class Post(
     val title: String,
     val content: String,
     val type: PostType,
-    // val author: IdOnlyAggregateReference<User, Long>,
     val authorId: AuthorId
+    // val author: AggregateReference<Post, Long>,
 ) : BaseEntity() {
 
     companion object {
@@ -17,11 +17,10 @@ data class Post private constructor(
                 title = title,
                 content = content,
                 type = postType,
-                // author = IdOnlyAggregateReference(userId),
                 authorId = authorId
+                // author = AggregateReference.to(authorId),
             )
     }
 }
 
-@JvmInline
-value class AuthorId(val value: Long)
+data class AuthorId(val value: Long)

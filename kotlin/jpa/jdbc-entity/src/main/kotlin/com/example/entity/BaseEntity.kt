@@ -6,9 +6,9 @@ import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.domain.Persistable
 import java.time.LocalDateTime
 
-open class BaseEntity : Persistable<Long> {
+abstract class BaseEntity : Persistable<Long> {
     @Id
-    var id: Long = 0L
+    var id: Long = 0
         protected set
 
     @CreatedDate
@@ -20,5 +20,6 @@ open class BaseEntity : Persistable<Long> {
         protected set
 
     override fun getId(): Long = id
+
     override fun isNew(): Boolean = id == 0L
 }
