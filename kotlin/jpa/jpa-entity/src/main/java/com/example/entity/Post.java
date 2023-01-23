@@ -2,9 +2,10 @@ package com.example.entity;
 
 import com.example.entity.type.PostType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Entity
 @NoArgsConstructor
@@ -12,19 +13,21 @@ import lombok.NoArgsConstructor;
 public class Post {
     @Id
     @GeneratedValue
+    @NotNull
     public Long id;
 
     @NotNull
     public String title;
 
-    @NotNull
+    @Nullable
     public String content;
 
     @Enumerated(EnumType.STRING)
     @NotNull
     public PostType type;
 
-    public static Post of(String title, String content, PostType type) {
+    @NotNull
+    public static Post of(@NotNull String title, @NotNull String content, @NotNull PostType type) {
         return new Post(null, title, content, type);
     }
 }
