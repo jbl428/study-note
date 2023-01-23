@@ -1,5 +1,6 @@
 package com.example.jdbc.service
 
+import com.example.entity.AuthorId
 import com.example.entity.Post
 import com.example.entity.PostType
 import com.example.jdbc.repository.PostRepository
@@ -13,8 +14,8 @@ class PostService(
 
     @Transactional
     fun create(): Post {
-        val userId = 100L
-        val post = Post.of("title", "content", PostType.QUESTION, userId)
+        val authorId = AuthorId(100)
+        val post = Post.of("title", "content", PostType.QUESTION, authorId)
 
         return postRepository.save(post)
     }
