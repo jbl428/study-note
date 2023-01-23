@@ -19,4 +19,15 @@ class PostService(
 
         return postRepository.save(post)
     }
+
+    @Transactional
+    fun shouldRollback(rollback: Boolean = true) {
+        val post1 = Post.of("question", "question body", PostType.QUESTION, AuthorId(100))
+        postRepository.save(post1)
+
+        if (rollback) throw RuntimeException("error")
+
+        val post2 = Post.of("answer", "answer body", PostType.ANSWER, AuthorId(200))
+        postRepository.save(post2)
+    }
 }
