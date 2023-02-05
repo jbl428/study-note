@@ -91,14 +91,14 @@ interface ConsoleService {
   log: (message: string) => T.Effect<unknown, never, void>
 }
 
-const ConsoleService = tag<ConsoleService>()
+export const ConsoleService = tag<ConsoleService>()
 const log = (message: string) => T.accessServiceM(ConsoleService)(_ => _.log(message))
 
 interface RandomService {
   rand: T.Effect<unknown, never, number>
 }
 
-const RandomService = tag<RandomService>()
+export const RandomService = tag<RandomService>()
 const rand = T.accessServiceM(RandomService)(_ => _.rand)
 
 class BadRandomValue {
@@ -121,7 +121,7 @@ export const program = T.gen(function* (_) {
 export function main() {
   pipe(
     program,
-    T.retry(S.exponential(10)["&&"](S.recurs(10))),
+    T.retry(S.exponential(10)['&&'](S.recurs(10))),
     T.provideService(ConsoleService)({
       log: (message: string) => new T.IEffectTotal(() => {
         console.log(message)
