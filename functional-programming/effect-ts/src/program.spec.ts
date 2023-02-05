@@ -1,6 +1,6 @@
 import {runtime} from "@effect-ts/jest/Test"
 import {BadRandomValue, ConsoleService, program, RandomService} from "./index";
-import {Exit, pipe} from "@effect-ts/core";
+import {pipe} from "@effect-ts/core";
 import * as T from "@effect-ts/core/Effect";
 import * as L from "@effect-ts/core/Effect/Layer";
 
@@ -27,7 +27,7 @@ describe('program', () => {
     )
   })
 
-  test('should print error if it is more then 0.5', async () => {
+  it('should print error if it is more then 0.5', () => {
     const messages: string[] = []
     const TestConsole = L.fromEffect(ConsoleService)(
       T.succeed({
@@ -40,12 +40,11 @@ describe('program', () => {
       })
     )
 
-    const result = await pipe(
+    return pipe(
       program,
       T.provideLayer(TestConsole['+++'](TestRandom)),
-      T.runPromiseExit
+      T.catchTag('BadRandomValue', (e) => T.succeed(e)),
+      T.map(e => expect(e?.value).toEqual(0.6))
     )
-
-    expect(result).toEqual(Exit.fail(new BadRandomValue(0.6)))
   })
 });

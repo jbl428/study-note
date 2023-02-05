@@ -6,6 +6,7 @@ import * as S from '@effect-ts/core/Effect/Schedule'
 import {runMain} from '@effect-ts/node/Runtime'
 import {tag} from '@effect-ts/core/Has'
 import {pipe} from "@effect-ts/core";
+import {Tagged} from "@effect-ts/system/Case";
 
 export function pureFunction() {
   function helloWorld(name: string) {
@@ -101,18 +102,16 @@ interface RandomService {
 export const RandomService = tag<RandomService>()
 const rand = T.accessServiceM(RandomService)(_ => _.rand)
 
-export class BadRandomValue {
-  readonly _tag = 'BadRandomValue'
-
-  constructor(readonly value: number) {
-  }
+export class BadRandomValue extends Tagged('BadRandomValue')<{
+  readonly value: number
+}> {
 }
 
 export const program = T.gen(function* (_) {
   const value = yield* _(rand)
 
   if (value > 0.5) {
-    return yield* _(T.fail(new BadRandomValue(value)))
+    return yield* _(T.fail(new BadRandomValue({value})))
   }
 
   yield* _(log(`got: ${value}`))
