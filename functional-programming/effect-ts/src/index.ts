@@ -101,7 +101,7 @@ interface RandomService {
 export const RandomService = tag<RandomService>()
 const rand = T.accessServiceM(RandomService)(_ => _.rand)
 
-class BadRandomValue {
+export class BadRandomValue {
   readonly _tag = 'BadRandomValue'
 
   constructor(readonly value: number) {
