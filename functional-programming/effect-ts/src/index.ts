@@ -122,12 +122,10 @@ export function main() {
     program,
     T.retry(S.exponential(10)['&&'](S.recurs(10))),
     T.provideService(ConsoleService)({
-      log: (message: string) => new T.IEffectTotal(() => {
-        console.log(message)
-      })
+      log: (message: string) => T.succeedWith(() => console.log(message))
     }),
     T.provideService(RandomService)({
-      rand: new T.IEffectTotal(() => Math.random())
+      rand: T.succeed(Math.random())
     }),
     runMain,
   )

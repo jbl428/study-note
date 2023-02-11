@@ -11,13 +11,11 @@ describe('program', () => {
     const messages: string[] = []
     const TestConsole = L.fromEffect(ConsoleService)(
       T.succeed({
-        log: (message: string) => new T.IEffectTotal(() => messages.push(message))
+        log: (message: string) => T.succeedWith(() => messages.push(message))
       })
     )
     const TestRandom = L.fromEffect(RandomService)(
-      T.succeed({
-        rand: new T.IEffectTotal(() => 0.3)
-      })
+      T.succeed({rand: T.succeed(0.3)})
     )
 
     return pipe(
@@ -31,13 +29,11 @@ describe('program', () => {
     const messages: string[] = []
     const TestConsole = L.fromEffect(ConsoleService)(
       T.succeed({
-        log: (message: string) => new T.IEffectTotal(() => messages.push(message))
+        log: (message: string) => T.succeedWith(() => messages.push(message))
       })
     )
     const TestRandom = L.fromEffect(RandomService)(
-      T.succeed({
-        rand: new T.IEffectTotal(() => 0.6)
-      })
+      T.succeed({rand: T.succeed(0.6)})
     )
 
     return pipe(
