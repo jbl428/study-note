@@ -61,6 +61,9 @@ devDependencies:
   jest:
     specifier: ^29.5.0
     version: 29.5.0(@types/node@20.3.1)(ts-node@10.9.1)
+  my-plugin:
+    specifier: file:./dist-plugin
+    version: file:dist-plugin
   prettier:
     specifier: ^3.0.0
     version: 3.0.0
@@ -5260,4 +5263,9 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    dev: true
+
+  file:dist-plugin:
+    resolution: {directory: dist-plugin, type: directory}
+    name: dist-plugin
     dev: true

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist-plugin"
+  },
+  "files": [
+    "plugin/index.ts",
+    "plugin/compiler-plugin.ts"
+  ]
+}
